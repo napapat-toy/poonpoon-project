@@ -26,90 +26,132 @@ const CATEGORY_STYLES: Record<
 > = {
   // ── รายจ่าย ──────────────────────────────────────────────────────────────
   "🍚 อาหาร-มื้อหลัก": {
-    activeClass: "bg-[#FFE0B2] border-[#FFB74D] text-[#E65100] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF8E1]",
+    activeClass:
+      "bg-[#FFE0B2] border-[#FFB74D] text-[#E65100] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF8E1]",
   },
   "☕ เครื่องดื่ม/ของว่าง": {
-    activeClass: "bg-[#FFF3E0] border-[#FFCC02] text-[#E65100] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]",
+    activeClass:
+      "bg-[#FFF3E0] border-[#FFCC02] text-[#E65100] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]",
   },
   "🛒 ของใช้ในบ้าน": {
-    activeClass: "bg-[#E8F5E9] border-[#A5D6A7] text-[#2E7D32] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#F1F8E9]",
+    activeClass:
+      "bg-[#E8F5E9] border-[#A5D6A7] text-[#2E7D32] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#F1F8E9]",
   },
   "🏠 ค่าเช่า/ที่พัก": {
-    activeClass: "bg-[#E3F2FD] border-[#90CAF9] text-[#0D47A1] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E3F2FD]/50",
+    activeClass:
+      "bg-[#E3F2FD] border-[#90CAF9] text-[#0D47A1] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E3F2FD]/50",
   },
   "💡 ค่าน้ำ-ไฟ-อินเทอร์เน็ต": {
-    activeClass: "bg-[#E1F5FE] border-[#4FC3F7] text-[#01579B] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]",
+    activeClass:
+      "bg-[#E1F5FE] border-[#4FC3F7] text-[#01579B] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]",
   },
   "🚌 เดินทาง-ประจำวัน": {
-    activeClass: "bg-[#F3E5F5] border-[#BA68C8] text-[#4A148C] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FAEAFF]",
+    activeClass:
+      "bg-[#F3E5F5] border-[#BA68C8] text-[#4A148C] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FAEAFF]",
   },
   "✈️ ท่องเที่ยว/เดินทางไกล": {
-    activeClass: "bg-[#EDE7F6] border-[#9575CD] text-[#311B92] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#EDE7F6]/50",
+    activeClass:
+      "bg-[#EDE7F6] border-[#9575CD] text-[#311B92] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#EDE7F6]/50",
   },
   "👕 เสื้อผ้า/แฟชั่น": {
-    activeClass: "bg-[#FCE4EC] border-[#F06292] text-[#880E4F] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF0F5]",
+    activeClass:
+      "bg-[#FCE4EC] border-[#F06292] text-[#880E4F] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF0F5]",
   },
   "📱 อุปกรณ์/แกดเจ็ต": {
-    activeClass: "bg-[#E8EAF6] border-[#7986CB] text-[#1A237E] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8EAF6]/50",
+    activeClass:
+      "bg-[#E8EAF6] border-[#7986CB] text-[#1A237E] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8EAF6]/50",
   },
   "🏥 ค่าหมอ/ยา": {
-    activeClass: "bg-[#FFEBEE] border-[#E57373] text-[#B71C1C] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFEBEE]/30",
+    activeClass:
+      "bg-[#FFEBEE] border-[#E57373] text-[#B71C1C] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFEBEE]/30",
   },
   "💇 ความงาม/ดูแลตัวเอง": {
-    activeClass: "bg-[#F8BBD9] border-[#EC407A] text-[#880E4F] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FCE4EC]/30",
+    activeClass:
+      "bg-[#F8BBD9] border-[#EC407A] text-[#880E4F] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FCE4EC]/30",
   },
   "🎓 การศึกษา/คอร์สเรียน": {
-    activeClass: "bg-[#E0F2F1] border-[#4DB6AC] text-[#004D40] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F2F1]/50",
+    activeClass:
+      "bg-[#E0F2F1] border-[#4DB6AC] text-[#004D40] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F2F1]/50",
   },
   "🎮 บันเทิง/เกม": {
-    activeClass: "bg-[#F9FBE7] border-[#DCE775] text-[#827717] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#F9FBE7]/50",
+    activeClass:
+      "bg-[#F9FBE7] border-[#DCE775] text-[#827717] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#F9FBE7]/50",
   },
   "🐾 สัตว์เลี้ยง": {
-    activeClass: "bg-[#FFF8E1] border-[#FFD54F] text-[#F57F17] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF8E1]/50",
+    activeClass:
+      "bg-[#FFF8E1] border-[#FFD54F] text-[#F57F17] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF8E1]/50",
   },
   "🎁 ของขวัญ/เงินช่วยเหลือ": {
-    activeClass: "bg-[#FFF9C4] border-[#FFF176] text-[#F9A825] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]/30",
+    activeClass:
+      "bg-[#FFF9C4] border-[#FFF176] text-[#F9A825] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]/30",
   },
   "🏦 ผ่อนชำระ/หนี้": {
-    activeClass: "bg-[#ECEFF1] border-[#90A4AE] text-[#263238] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#ECEFF1]/50",
+    activeClass:
+      "bg-[#ECEFF1] border-[#90A4AE] text-[#263238] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#ECEFF1]/50",
   },
 
   // ── รายรับ ───────────────────────────────────────────────────────────────
   "💰 เงินเดือน/ค่าจ้างประจำ": {
-    activeClass: "bg-[#E8F5E9] border-[#81C784] text-[#1B5E20] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
+    activeClass:
+      "bg-[#E8F5E9] border-[#81C784] text-[#1B5E20] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
   },
   "💼 รายได้อิสระ/ฟรีแลนซ์": {
-    activeClass: "bg-[#E0F7FA] border-[#4DD0E1] text-[#006064] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]/30",
+    activeClass:
+      "bg-[#E0F7FA] border-[#4DD0E1] text-[#006064] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]/30",
   },
   "🎁 โบนัส/เงินรางวัล": {
-    activeClass: "bg-[#FFFDE7] border-[#FFF176] text-[#F57F17] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]/30",
+    activeClass:
+      "bg-[#FFFDE7] border-[#FFF176] text-[#F57F17] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]/30",
   },
   "📈 เงินลงทุน/ปันผล": {
-    activeClass: "bg-[#E8F5E9] border-[#66BB6A] text-[#1B5E20] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
+    activeClass:
+      "bg-[#E8F5E9] border-[#66BB6A] text-[#1B5E20] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
   },
   "💵 เงินคืน/เงินทอน": {
-    activeClass: "bg-[#E8F5E9] border-[#A5D6A7] text-[#388E3C] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/20",
+    activeClass:
+      "bg-[#E8F5E9] border-[#A5D6A7] text-[#388E3C] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/20",
   },
 };
 
@@ -166,7 +208,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
           </label>
           <Input
             type="number"
-            step="0.01"
+            step="1"
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
