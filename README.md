@@ -95,15 +95,15 @@ src/
 │   ├── manifest.ts          # เมตาดาต้ารูทสำหรับสร้าง manifest.json สำหรับแอปพลิเคชัน PWA
 │   └── page.tsx             # หน้าแดชบอร์ดหลัก ทำหน้าที่ดึงข้อมูลจาก Server-Side
 ├── components/              # UI Components แยกอิสระ
-│   ├── ui/                  # Reusable Atom Components (ปุ่ม, อินพุต, การ์ดพาสเทล)
+│   ├── ui/                  # Reusable & Base Components (ปุ่ม, อินพุต, การ์ดพาสเทล)
+│   │   ├── BalanceCard.tsx  # บล็อกแสดงยอดรวม ยอดรับ และยอดจ่ายประจำเดือน
 │   │   ├── button.tsx
 │   │   ├── card.tsx
-│   │   └── input.tsx
-│   ├── BalanceCard.tsx      # บล็อกแสดงยอดรวม ยอดรับ และยอดจ่ายประจำเดือน
-│   ├── CategoryChart.tsx    # Donut Chart สีพาสเทลวาดด้วย SVG
+│   │   ├── CategoryChart.tsx # Donut Chart สีพาสเทลวาดด้วย SVG
+│   │   ├── input.tsx
+│   │   └── TransactionForm.tsx # ฟอร์มเลือกหมวดหมู่พาสเทลและระบุยอดเงิน
 │   ├── DashboardClient.tsx  # ตัวประมวลผลจัดการ Client State ของแดชบอร์ด
 │   ├── DashboardHeader.tsx  # ส่วนหัวทักทายพี่ปูพูนพร้อมอิโมจิโปรไฟล์
-│   ├── TransactionForm.tsx  # ฟอร์มเลือกหมวดหมู่พาสเทลและระบุยอดเงิน
 │   └── TransactionHistory.tsx # รายการความเคลื่อนไหวล่าสุดภาษาไทยอ่านง่าย
 ├── hooks/                   # Custom React Hooks
 │   └── useTransactionForm.ts # แยกตรรกะการทำงาน (Logic) ของฟอร์มบันทึก ออกจาก UI
