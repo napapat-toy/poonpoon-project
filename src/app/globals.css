@@ -1,26 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FDFBF7;
+  --foreground: #4A3F35; /* สีน้ำตาลเข้มละมุน (ห้ามใช้สีดำสนิท) */
+  --primary: #D4A373; /* ส้ม/น้ำตาลพาสเทลอบอุ่น */
+  --card-bg: #FFFFFF;
+  --pastel-green: #E8F5E9;
+  --pastel-pink: #FCE4EC;
+  --pastel-blue: #E3F2FD;
+  --text-dark: #3C3630;
+  --text-muted: #7D746C;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary-pastel: var(--primary);
+  --color-card-bg: var(--card-bg);
+  --color-pastel-green: var(--pastel-green);
+  --color-pastel-pink: var(--pastel-pink);
+  --color-pastel-blue: var(--pastel-blue);
+  --color-text-dark: var(--text-dark);
+  --color-text-muted: var(--text-muted);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* เพิ่มความละมุนให้กับ Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FDFBF7;
+}
+::-webkit-scrollbar-thumb {
+  background: #E6DFD5;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D5CBBF;
 }
