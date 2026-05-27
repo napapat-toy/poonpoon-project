@@ -1,5 +1,3 @@
-import React from "react";
-
 import { PieChart } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -28,10 +26,13 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
   const totalExpense = expenses.reduce((sum, t) => sum + t.amount, 0);
 
   // 2. จัดกลุ่มรายจ่ายตามหมวดหมู่
-  const categoryGroups = expenses.reduce((groups, t) => {
-    groups[t.category] = (groups[t.category] || 0) + t.amount;
-    return groups;
-  }, {} as Record<string, number>);
+  const categoryGroups = expenses.reduce(
+    (groups, t) => {
+      groups[t.category] = (groups[t.category] || 0) + t.amount;
+      return groups;
+    },
+    {} as Record<string, number>,
+  );
 
   // 3. แปลงกลุ่มรายจ่ายเป็น Array เพื่อใช้จัดอันดับและคำนวณสัดส่วน
   const categoryData = Object.entries(categoryGroups)
@@ -71,14 +72,21 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
         // กล่องแจ้งเตือนกรณียังไม่มีประวัติรายจ่าย
         <div className="py-8 text-center space-y-2 select-none">
           <span className="text-4xl block">🦖</span>
-          <p className="text-sm font-semibold text-text-dark">ยังไม่มีข้อมูลรายจ่ายในระบบ</p>
-          <p className="text-xs text-text-muted">ลองบันทึกรายจ่ายด้านบนเพื่อแสดงกราฟวิเคราะห์นะพูน!</p>
+          <p className="text-sm font-semibold text-text-dark">
+            ยังไม่มีข้อมูลรายจ่ายในระบบ
+          </p>
+          <p className="text-xs text-text-muted">
+            ลองบันทึกรายจ่ายด้านบนเพื่อแสดงกราฟวิเคราะห์นะพูน!
+          </p>
         </div>
       ) : (
         <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-2">
           {/* ส่วนแสดงผลกราฟ Donut SVG แบบแฮนด์เมดน่ารัก */}
           <div className="relative h-32 w-32 shrink-0">
-            <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-95">
+            <svg
+              viewBox="0 0 100 100"
+              className="w-full h-full transform -rotate-95"
+            >
               {/* วงกลมพื้นหลัง (Background Circle) */}
               <circle
                 cx="50"
@@ -108,7 +116,7 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
                 );
               })}
             </svg>
-            
+
             {/* ข้อความกลางโดนัท */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
@@ -123,7 +131,10 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
           {/* ส่วนแสดง Legend รายละเอียดสีพาสเทลและมูลค่า */}
           <div className="flex-1 w-full space-y-2">
             {categoryData.map((data, index) => (
-              <div key={index} className="flex items-center justify-between text-xs">
+              <div
+                key={index}
+                className="flex items-center justify-between text-xs"
+              >
                 <div className="flex items-center gap-2">
                   <div
                     className="h-3 w-3 rounded-full shrink-0"

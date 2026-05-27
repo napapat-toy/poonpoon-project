@@ -1,8 +1,12 @@
 "use client";
 
-import React from "react";
-
-import { Plus, Calendar, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Plus,
+  Calendar,
+  Sparkles,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,36 +28,52 @@ const CATEGORY_STYLES: Record<
   }
 > = {
   "🍔 อาหาร": {
-    activeClass: "bg-[#FFE0B2] border-[#FFB74D] text-[#E65100] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF8E1]",
+    activeClass:
+      "bg-[#FFE0B2] border-[#FFB74D] text-[#E65100] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF8E1]",
   },
   "🏠 ค่าน้ำค่าไฟ": {
-    activeClass: "bg-[#E1F5FE] border-[#4FC3F7] text-[#01579B] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]",
+    activeClass:
+      "bg-[#E1F5FE] border-[#4FC3F7] text-[#01579B] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]",
   },
   "🚗 เดินทาง": {
-    activeClass: "bg-[#F3E5F5] border-[#BA68C8] text-[#4A148C] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FAEAFF]",
+    activeClass:
+      "bg-[#F3E5F5] border-[#BA68C8] text-[#4A148C] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FAEAFF]",
   },
   "🛍️ ช้อปปิ้ง": {
-    activeClass: "bg-[#FCE4EC] border-[#F06292] text-[#880E4F] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF0F5]",
+    activeClass:
+      "bg-[#FCE4EC] border-[#F06292] text-[#880E4F] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFF0F5]",
   },
   "🏥 สุขภาพ": {
-    activeClass: "bg-[#FFEBEE] border-[#E57373] text-[#B71C1C] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFEBEE]/30",
+    activeClass:
+      "bg-[#FFEBEE] border-[#E57373] text-[#B71C1C] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFEBEE]/30",
   },
   "💰 เงินเดือน": {
-    activeClass: "bg-[#E8F5E9] border-[#81C784] text-[#1B5E20] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
+    activeClass:
+      "bg-[#E8F5E9] border-[#81C784] text-[#1B5E20] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
   },
   "🎁 เงินขวัญถุง/โบนัส": {
-    activeClass: "bg-[#FFFDE7] border-[#FFF176] text-[#F57F17] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]/30",
+    activeClass:
+      "bg-[#FFFDE7] border-[#FFF176] text-[#F57F17] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FFFDE7]/30",
   },
   "📈 เงินออมงอกเงย": {
-    activeClass: "bg-[#E0F7FA] border-[#4DD0E1] text-[#006064] font-bold shadow-sm",
-    inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]/30",
+    activeClass:
+      "bg-[#E0F7FA] border-[#4DD0E1] text-[#006064] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E0F7FA]/30",
   },
 };
 
@@ -77,9 +97,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
     <Card className="space-y-4">
       <div className="flex items-center gap-2 border-b border-[#F5EFE6] pb-3">
         <Sparkles className="h-5 w-5 text-primary-pastel animate-pulse" />
-        <h3 className="font-bold text-text-dark text-base">
-          บันทึกรายการด่วน
-        </h3>
+        <h3 className="font-bold text-text-dark text-base">บันทึกรายการด่วน</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -131,8 +149,10 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
           <div className="grid grid-cols-2 gap-2">
             {getCategories().map((cat) => {
               const style = CATEGORY_STYLES[cat] || {
-                activeClass: "bg-primary-pastel/15 border-primary-pastel text-text-dark font-semibold shadow-sm",
-                inactiveClass: "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
+                activeClass:
+                  "bg-primary-pastel/15 border-primary-pastel text-text-dark font-semibold shadow-sm",
+                inactiveClass:
+                  "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
               };
               return (
                 <button
@@ -142,7 +162,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
                   disabled={isPending}
                   className={cn(
                     "py-2.5 px-3 text-xs font-bold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2",
-                    category === cat ? style.activeClass : style.inactiveClass
+                    category === cat ? style.activeClass : style.inactiveClass,
                   )}
                 >
                   <span>{cat}</span>
@@ -175,7 +195,9 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
           className="w-full py-3.5"
         >
           {!isPending && <Plus className="h-4 w-4 mr-1 shrink-0" />}
-          <span>{isPending ? "กำลังพูนเงินออม..." : "บันทึกความดีทางการเงิน ✨"}</span>
+          <span>
+            {isPending ? "กำลังพูนเงินออม..." : "บันทึกความดีทางการเงิน ✨"}
+          </span>
         </Button>
       </form>
 
@@ -186,7 +208,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
             "p-3 rounded-2xl flex items-start gap-2 text-xs border",
             feedback.success
               ? "bg-emerald-50 border-emerald-100 text-emerald-800"
-              : "bg-rose-50 border-rose-100 text-rose-800"
+              : "bg-rose-50 border-rose-100 text-rose-800",
           )}
         >
           {feedback.success ? (

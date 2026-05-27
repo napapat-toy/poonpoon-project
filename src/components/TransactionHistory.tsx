@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Transaction } from "@/types";
@@ -47,7 +45,7 @@ export function TransactionHistory({
                 <div
                   className={cn(
                     "h-9 w-9 rounded-xl flex items-center justify-center text-sm",
-                    item.type === "income" ? "bg-[#E8F5E9]" : "bg-[#FCE4EC]"
+                    item.type === "income" ? "bg-[#E8F5E9]" : "bg-[#FCE4EC]",
                   )}
                 >
                   {item.type === "income" ? "💸" : "🍰"}
@@ -64,7 +62,7 @@ export function TransactionHistory({
               <span
                 className={cn(
                   "text-sm font-bold",
-                  item.type === "income" ? "text-[#1B5E20]" : "text-[#880E4F]"
+                  item.type === "income" ? "text-[#1B5E20]" : "text-[#880E4F]",
                 )}
               >
                 {item.type === "income" ? "+" : "-"}฿

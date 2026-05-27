@@ -1,34 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { BalanceCard } from "@/components/ui/BalanceCard";
 import { CategoryChart } from "@/components/ui/CategoryChart";
 import { TransactionForm } from "@/components/ui/TransactionForm";
-import { Transaction, SavingGoal } from "@/types";
+import { Transaction } from "@/types";
 import { createClient } from "@/utils/supabase/client";
 
 interface DashboardClientProps {
   initialTransactions: Transaction[];
-  initialSavingGoals?: SavingGoal[];
 }
 
-export function DashboardClient({
-  initialTransactions,
-  initialSavingGoals = [],
-}: DashboardClientProps) {
+export function DashboardClient({ initialTransactions }: DashboardClientProps) {
   // โหลดรายการธุรกรรมเริ่มต้นจาก Server Component และมาเก็บเป็น Client State
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
-  const [savingGoals] = useState<SavingGoal[]>(initialSavingGoals);
-
-  // แสดงผลลัพธ์เป้าหมายการเงินใน Console เพื่อเป็นข้อมูลตรวจสอบระบบ
-  useEffect(() => {
-    if (savingGoals.length > 0) {
-      console.log(`[PoonPoon] Loaded ${savingGoals.length} saving goals from database.`);
-    }
-  }, [savingGoals]);
+  const [transactions, setTransactions] =
+    useState<Transaction[]>(initialTransactions);
 
   // สถานะข้อมูลผู้ใช้งานสำหรับแสดงบน Header
   const [userProfile, setUserProfile] = useState<{
@@ -80,7 +69,10 @@ export function DashboardClient({
   return (
     <div className="space-y-6">
       {/* 1. Header ทักทาย */}
-      <DashboardHeader displayName={userProfile.displayName} emoji={userProfile.emoji} />
+      <DashboardHeader
+        displayName={userProfile.displayName}
+        emoji={userProfile.emoji}
+      />
 
       {/* 2. Card สรุปยอดเงินคงเหลือ / รายรับ / รายจ่าย */}
       <BalanceCard

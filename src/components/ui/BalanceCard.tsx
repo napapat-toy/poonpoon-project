@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
