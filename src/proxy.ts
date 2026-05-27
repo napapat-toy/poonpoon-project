@@ -45,7 +45,10 @@ export default async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthPage = request.nextUrl.pathname.startsWith("/login");
+  // /login และ /auth/* (เช่น /auth/callback) ต้องปล่อยผ่านโดยไม่บังคับ session
+  const isAuthPage =
+    request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/auth/");
 
   // ดักเส้นทางตามสถานะการเข้าสู่ระบบ (Protected Route Gate)
   if (!user && !isAuthPage) {
