@@ -97,26 +97,10 @@ export function useTransactionForm({
           setAmount("");
           setCategory("");
         } else {
-          console.warn(
-            "Supabase not connected. Falling back to local state:",
-            result.error,
-          );
           setFeedback({
-            success: true,
-            message:
-              result.error === "DATABASE_NOT_CONFIGURED"
-                ? "บันทึกในเครื่องสำเร็จ! 🪙 (จำลองเนื่องจากยังไม่ได้ผูก Database)"
-                : `บันทึกในเครื่องสำเร็จ! 🪙 (พบข้อผิดพลาด: ${result.error})`,
+            success: false,
+            message: result.error ?? "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
           });
-          onAddTransaction({
-            id: String(Date.now()),
-            type,
-            amount: parsedAmount,
-            category,
-            date,
-          });
-          setAmount("");
-          setCategory("");
         }
       } catch (err) {
         console.error(err);

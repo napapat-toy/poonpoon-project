@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 
 import { AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
 
@@ -11,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{
     success: boolean;
@@ -21,18 +19,6 @@ export default function LoginPage() {
   const handleGoogleLogin = () => {
     setFeedback(null);
     const supabase = createClient();
-
-    if (!supabase) {
-      setFeedback({
-        success: true,
-        message:
-          "เข้าสู่ระบบจำลองด้วย Google สำเร็จ! 🪙 (ฐานข้อมูลยังไม่ได้ผูกต่อ)",
-      });
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
-      return;
-    }
 
     startTransition(async () => {
       try {

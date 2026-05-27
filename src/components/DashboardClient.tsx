@@ -32,7 +32,6 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient();
-      if (!supabase) return; // โหมดจำลอง
 
       const {
         data: { user },

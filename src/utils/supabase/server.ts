@@ -1,20 +1,22 @@
 import { cookies } from "next/headers";
 
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieMethodsServer } from "@supabase/ssr";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabasePublishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+
+if (!supabaseUrl || !supabasePublishableKey) {
+  throw new Error(
+    "[Supabase] Missing env vars: NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  );
+}
 
 /**
- * Creates a Supabase Server Client safely.
- * Returns null if the database is not configured to prevent SSR crashes.
+ * Creates a Supabase Server Client for use in Server Components and Server Actions.
  */
 export async function createClient() {
   const cookieStore = await cookies();
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!supabaseUrl || !supabasePublishableKey) {
-    return null;
-  }
 
   return createServerClient(supabaseUrl, supabasePublishableKey, {
     cookies: {
@@ -27,10 +29,9 @@ export async function createClient() {
             cookieStore.set(name, value, options),
           );
         } catch {
-          // The `setAll` method can be called from a Server Component.
-          // This can be ignored if you have middleware refreshing user sessions.
+          // setAll อาจถูกเรียกจาก Server Component — middleware จะ refresh session แทน
         }
       },
-    },
+    } satisfies CookieMethodsServer,
   });
 }

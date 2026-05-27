@@ -1,34 +1,29 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
 
-  if (code) {
-    const cookieStore = await cookies();
+  // ถ้าไม่มี code ใน URL → น่าจะมีปัญหาจาก Google/Supabase ดีดไปหน้า Login พร้อม error
+  if (!code) {
+    const loginUrl = new URL("/login", requestUrl.origin);
+    loginUrl.searchParams.set("error", "missing_code");
+    return NextResponse.redirect(loginUrl);
+  }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabasePublishableKey =
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  const supabase = await createClient();
 
-    const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
-        },
-      },
-    });
+  // แลกเปลี่ยนตั๋วจาก Google เป็น Session ของ Supabase
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    // แลกเปลี่ยนตั๋วจาก Google เป็น Session ของ Supabase
-    await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    // code หมดอายุ, ถูกใช้ไปแล้ว หรือ token ผิดพลาด → ดีดกลับหน้า Login
+    console.error("[Auth Callback] exchangeCodeForSession failed:", error.message);
+    const loginUrl = new URL("/login", requestUrl.origin);
+    loginUrl.searchParams.set("error", "auth_failed");
+    return NextResponse.redirect(loginUrl);
   }
 
   // ล็อกอินเสร็จ ดีดกลับหน้าแรก (Dashboard พูนพูน)
