@@ -11,11 +11,13 @@ interface UseTransactionFormProps {
  * Custom hook to manage the transaction form's state and submission logic.
  * Separates presentation (UI) from business logic.
  */
-export function useTransactionForm({ onAddTransaction }: UseTransactionFormProps) {
+export function useTransactionForm({
+  onAddTransaction,
+}: UseTransactionFormProps) {
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<"income" | "expense">("expense");
   const [category, setCategory] = useState("");
-  
+
   // ป้องกัน Hydration Error: ตั้งค่าเริ่มต้นเป็นค่าว่าง แล้วจึงระบุวันที่ฝั่ง Client ตอนเมาท์คอมโพเนนต์
   const [date, setDate] = useState("");
 
@@ -34,11 +36,7 @@ export function useTransactionForm({ onAddTransaction }: UseTransactionFormProps
 
   const getCategories = () => {
     if (type === "income") {
-      return [
-        "💰 เงินเดือน",
-        "🎁 เงินขวัญถุง/โบนัส",
-        "📈 เงินออมงอกเงย",
-      ];
+      return ["💰 เงินเดือน", "🎁 เงินขวัญถุง/โบนัส", "📈 เงินออมงอกเงย"];
     }
     return [
       "🍔 อาหาร",
@@ -101,7 +99,7 @@ export function useTransactionForm({ onAddTransaction }: UseTransactionFormProps
         } else {
           console.warn(
             "Supabase not connected. Falling back to local state:",
-            result.error
+            result.error,
           );
           setFeedback({
             success: true,
