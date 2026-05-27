@@ -2,11 +2,13 @@
 
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, User, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
+
+import { AlertCircle, CheckCircle2, Eye, EyeOff, Lock, Mail, Sparkles, User } from "lucide-react";
+
 import { loginUser, signupUser } from "@/actions/auth";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {

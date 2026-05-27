@@ -1,7 +1,9 @@
 import React from "react";
+
 import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface BalanceCardProps {
   balance: number;

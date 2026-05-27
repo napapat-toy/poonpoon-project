@@ -1,21 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 import { DashboardHeader } from "@/components/DashboardHeader";
-import { BalanceCard } from "@/components/BalanceCard";
-import { CategoryChart } from "@/components/CategoryChart";
-import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionHistory } from "@/components/TransactionHistory";
-import { Transaction } from "@/types";
+import { BalanceCard } from "@/components/ui/BalanceCard";
+import { CategoryChart } from "@/components/ui/CategoryChart";
+import { TransactionForm } from "@/components/ui/TransactionForm";
+import { Transaction, SavingGoal } from "@/types";
 import { createClient } from "@/utils/supabase/client";
 
 interface DashboardClientProps {
   initialTransactions: Transaction[];
+  initialSavingGoals?: SavingGoal[];
 }
 
-export function DashboardClient({ initialTransactions }: DashboardClientProps) {
+export function DashboardClient({
+  initialTransactions,
+  initialSavingGoals = [],
+}: DashboardClientProps) {
   // โหลดรายการธุรกรรมเริ่มต้นจาก Server Component และมาเก็บเป็น Client State
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [savingGoals] = useState<SavingGoal[]>(initialSavingGoals);
+
+  // แสดงผลลัพธ์เป้าหมายการเงินใน Console เพื่อเป็นข้อมูลตรวจสอบระบบ
+  useEffect(() => {
+    if (savingGoals.length > 0) {
+      console.log(`[PoonPoon] Loaded ${savingGoals.length} saving goals from database.`);
+    }
+  }, [savingGoals]);
 
   // สถานะข้อมูลผู้ใช้งานสำหรับแสดงบน Header
   const [userProfile, setUserProfile] = useState<{

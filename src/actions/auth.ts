@@ -1,8 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/utils/supabase/server'
+
 import { z } from 'zod'
+
+import { createClient } from '@/utils/supabase/server'
 
 const loginSchema = z.object({
   email: z.string().email('รูปแบบอีเมลไม่ถูกต้อง'),
@@ -25,10 +27,6 @@ export async function loginUser(input: LoginInput) {
     if (!validation.success) {
       const errorMessages = validation.error.issues.map((i) => i.message).join(', ')
       return { success: false, error: errorMessages }
-    }
-
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return { success: false, error: 'DATABASE_NOT_CONFIGURED' }
     }
 
     const { email, password } = validation.data
@@ -63,10 +61,6 @@ export async function signupUser(input: SignupInput) {
     if (!validation.success) {
       const errorMessages = validation.error.issues.map((i) => i.message).join(', ')
       return { success: false, error: errorMessages }
-    }
-
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return { success: false, error: 'DATABASE_NOT_CONFIGURED' }
     }
 
     const { email, password, displayName } = validation.data

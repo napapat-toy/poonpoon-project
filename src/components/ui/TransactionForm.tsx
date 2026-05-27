@@ -1,11 +1,15 @@
+"use client";
+
 import React from "react";
+
 import { Plus, Calendar, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useTransactionForm } from "@/hooks/useTransactionForm";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Transaction } from "@/types";
-import { Card } from "@/components/ui/card";
 
 interface TransactionFormProps {
   onAddTransaction: (transaction: Transaction) => void;

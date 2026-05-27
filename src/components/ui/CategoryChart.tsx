@@ -1,8 +1,10 @@
 import React from "react";
+
 import { PieChart } from "lucide-react";
-import { Transaction } from "@/types";
-import { cn } from "@/lib/utils";
+
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { Transaction } from "@/types";
 
 interface CategoryChartProps {
   transactions: Transaction[];

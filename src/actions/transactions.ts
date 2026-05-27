@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+
 import { createClient } from '@/utils/supabase/server'
 
 // 1. กำหนด Zod Schema สำหรับตรวจสอบความถูกต้องของข้อมูล
@@ -44,8 +45,8 @@ export async function createTransaction(rawInput: CreateTransactionInput) {
     const validation = createTransactionSchema.safeParse(rawInput)
     if (!validation.success) {
       const errorMessages = validation.error.issues
-        .map((issue) => issue.message)
-        .join(', ')
+          .map((issue) => issue.message)
+          .join(', ')
       return {
         success: false,
         error: `ข้อมูลไม่ถูกต้อง: ${errorMessages}`,
@@ -54,15 +55,7 @@ export async function createTransaction(rawInput: CreateTransactionInput) {
 
     const { amount, type, category, date } = validation.data
 
-    // 3. ตรวจสอบการเชื่อมต่อฐานข้อมูล (ป้องกันการแครชในโหมดพัฒนาตัวอย่างหน้าบ้าน)
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return {
-        success: false,
-        error: 'DATABASE_NOT_CONFIGURED',
-      }
-    }
-
-    // 4. เชื่อมต่อ Supabase Server Client และทำ Auth Check
+    // 3. เชื่อมต่อ Supabase Server Client และทำ Auth Check
     const supabase = await createClient()
     if (!supabase) {
       return {
