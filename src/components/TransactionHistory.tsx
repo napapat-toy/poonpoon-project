@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Transaction } from "@/types";
+import { formatThaiDateShort } from "@/utils/format";
 
 interface TransactionHistoryProps {
   transactions: Transaction[];
@@ -55,7 +56,7 @@ export function TransactionHistory({
                     {item.category}
                   </h4>
                   <span className="text-xs text-text-muted block mt-0.5">
-                    {item.date}
+                    {formatThaiDateShort(item.date)}
                   </span>
                 </div>
               </div>
