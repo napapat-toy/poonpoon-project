@@ -1,0 +1,225 @@
+"use client";
+
+import { useState } from "react";
+import { Trash2, Calendar, PiggyBank, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { SavingGoal } from "@/types";
+
+interface SavingGoalItemProps {
+  item: SavingGoal;
+  onUpdateGoalAmount: (
+    id: string,
+    amount: number,
+  ) => Promise<{ success: boolean; error?: string }>;
+  onDeleteGoal: (id: string) => Promise<{ success: boolean; error?: string }>;
+}
+
+export function SavingGoalItem({
+  item,
+  onUpdateGoalAmount,
+  onDeleteGoal,
+}: SavingGoalItemProps) {
+  const [isActionActive, setIsActionActive] = useState(false);
+  const [actionAmount, setActionAmount] = useState("");
+  const [isActionSubmitting, setIsActionSubmitting] = useState(false);
+
+  // ฟอร์แมตวันที่เป้าหมายตามแบบไทย (พ.ศ.) แบบไม่มีส่วนของเวลา
+  const formatTargetDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return "";
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      return new Intl.DateTimeFormat("th-TH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        calendar: "buddhist",
+      }).format(date);
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const handleUpdateAmount = async (isDeposit: boolean) => {
+    const amountVal = parseFloat(actionAmount);
+    if (isNaN(amountVal) || amountVal <= 0) {
+      alert("กรุณาระบุจำนวนเงินที่ถูกต้องและมากกว่า 0 บาทนะพูน");
+      return;
+    }
+
+    setIsActionSubmitting(true);
+    const changeAmount = isDeposit ? amountVal : -amountVal;
+    const result = await onUpdateGoalAmount(item.id, changeAmount);
+    setIsActionSubmitting(false);
+
+    if (result.success) {
+      setIsActionActive(false);
+      setActionAmount("");
+    } else {
+      alert(result.error || "ไม่สามารถอัปเดตยอดเงินได้นะพูน");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm(`ต้องการลบเป้าหมาย "${item.name}" ใช่หรือไม่นะพูน? 🪙`)) {
+      const result = await onDeleteGoal(item.id);
+      if (!result.success) {
+        alert(result.error || "ไม่สามารถลบเป้าหมายได้นะพูน");
+      }
+    }
+  };
+
+  const percentage = Math.min(
+    100,
+    Math.max(0, Math.round((item.current_amount / item.target_amount) * 100)),
+  );
+
+  // คำนวณสีโทนพาสเทลตามเปอร์เซ็นต์ความสำเร็จ
+  let progressGradient = "from-[#FFB74D] to-[#FFA726]"; // สีส้ม
+  let textProgressColor = "text-[#E65100]";
+  let bgFillColor = "bg-[#FFE0B2]/30";
+  if (percentage >= 100) {
+    progressGradient = "from-[#81C784] to-[#66BB6A]"; // สีเขียวสำเร็จ
+    textProgressColor = "text-[#2E7D32]";
+    bgFillColor = "bg-[#E8F5E9]/50";
+  } else if (percentage < 30) {
+    progressGradient = "from-[#FF8A80] to-[#FF5252]"; // สีแดงช่วงเริ่มต้น
+    textProgressColor = "text-[#C62828]";
+    bgFillColor = "bg-[#FFEBEE]/40";
+  }
+
+  return (
+    <div
+      className={cn(
+        "p-4 border border-[#F7F5F0] rounded-2xl space-y-2.5 transition-all",
+        bgFillColor,
+        percentage >= 100 && "border-[#E8F5E9]",
+      )}
+    >
+      {/* หัวข้อย่อยของเป้าหมาย */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-0.5">
+          <h4 className="text-sm font-bold text-text-dark flex items-center gap-1">
+            <span>✨</span> {item.name}
+          </h4>
+          {item.target_date && (
+            <span className="text-xs text-text-muted font-medium flex items-center gap-1">
+              <Calendar className="h-3 w-3" /> สิ้นสุด:{" "}
+              {formatTargetDate(item.target_date)}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-xs font-extrabold text-text-dark">
+            ฿
+            {item.current_amount.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+          <span className="text-xs text-text-muted font-medium">/</span>
+          <span className="text-xs font-bold text-text-muted">
+            ฿
+            {item.target_amount.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+        </div>
+      </div>
+
+      {/* แถบ Progress Bar */}
+      <div className="space-y-1">
+        <div className="h-3 w-full bg-[#F7F5F0] rounded-full overflow-hidden relative">
+          <div
+            className={cn(
+              "h-full rounded-full bg-linear-to-r transition-all duration-700 ease-out",
+              progressGradient,
+            )}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <div className="flex justify-between items-center text-[10px] font-bold">
+          <span className={textProgressColor}>{percentage}% ของเป้าหมาย</span>
+          {percentage >= 100 && (
+            <span className="text-[#2E7D32] animate-bounce">
+              ยินดีด้วยนะพูน! สำเร็จแล้ว 🌟
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* เมนูการจัดการและปุ่มดำเนินการ */}
+      <div className="flex justify-between items-center pt-1 border-t border-[#F7F5F0]/50">
+        <button
+          type="button"
+          onClick={handleDelete}
+          className="p-1.5 text-text-muted hover:text-[#880E4F] hover:bg-[#FCE4EC]/50 rounded-xl transition-all cursor-pointer"
+          aria-label="ลบเป้าหมาย"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+
+        {!isActionActive && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsActionActive(true);
+              setActionAmount("");
+            }}
+            className="flex items-center gap-1 text-[11px] font-extrabold text-[#2E7D32] bg-[#E8F5E9] hover:bg-[#C8E6C9] px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+          >
+            <PiggyBank className="h-3.5 w-3.5" /> จัดการยอดเงิน 🪙
+          </button>
+        )}
+      </div>
+
+      {/* แผงขยายสำหรับ หยอดกระปุก / ถอนเงิน */}
+      {isActionActive && (
+        <div className="mt-3 flex flex-col sm:flex-row items-center gap-2 bg-[#FDFBF7] p-3 rounded-2xl border border-[#F3EFE9] animate-fadeIn">
+          <div className="relative w-full sm:w-auto flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-text-muted">
+              ฿
+            </span>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="ระบุจำนวนเงิน..."
+              value={actionAmount}
+              onChange={(e) => setActionAmount(e.target.value)}
+              className="w-full pl-6 pr-2.5 py-1.5 bg-white border border-[#EAE4DB] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#81C784]/30 font-bold text-text-dark"
+            />
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => handleUpdateAmount(true)}
+              disabled={isActionSubmitting}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#81C784] hover:bg-[#66BB6A] transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <PiggyBank className="h-3.5 w-3.5" /> หยอด
+            </button>
+            <button
+              type="button"
+              onClick={() => handleUpdateAmount(false)}
+              disabled={isActionSubmitting}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#FF8A80] hover:bg-[#FF5252] transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <X className="h-3.5 w-3.5" /> ถอน
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsActionActive(false);
+                setActionAmount("");
+              }}
+              className="px-2 py-1.5 rounded-xl text-xs font-bold text-text-muted hover:bg-[#F7F5F0] transition-all cursor-pointer"
+            >
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
