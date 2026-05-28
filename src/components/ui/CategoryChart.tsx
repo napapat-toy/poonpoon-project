@@ -62,9 +62,11 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
     const accumulated = categoryData
       .slice(0, index)
       .reduce((sum, item) => sum + item.percentage, 0);
-    const strokeOffset = circumference - (accumulated / 100) * circumference;
+    const dashLength = (data.percentage / 100) * circumference;
+    const strokeOffset = -((accumulated / 100) * circumference);
     return {
       ...data,
+      dashLength,
       strokeOffset,
     };
   });
@@ -72,8 +74,8 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
   return (
     <Card className={cn("space-y-4", className)}>
       <div className="flex items-center gap-2 border-b border-[#F5EFE6] pb-3">
-        <PieChart className="h-5 w-5 text-primary-pastel" />
-        <h3 className="font-bold text-text-dark text-base">
+        <PieChart className="h-5.5 w-5.5 text-primary-pastel" />
+        <h3 className="font-extrabold text-text-dark text-lg">
           สัดส่วนรายจ่ายรายหมวดหมู่
         </h3>
       </div>
@@ -95,7 +97,7 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
           <div className="relative h-32 w-32 shrink-0">
             <svg
               viewBox="0 0 100 100"
-              className="w-full h-full transform -rotate-95"
+              className="w-full h-full transform -rotate-90"
             >
               {/* วงกลมพื้นหลัง (Background Circle) */}
               <circle
@@ -118,7 +120,7 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
                     fill="transparent"
                     stroke={data.color}
                     strokeWidth="12"
-                    strokeDasharray={circumference}
+                    strokeDasharray={`${data.dashLength} ${circumference}`}
                     strokeDashoffset={data.strokeOffset}
                     strokeLinecap="round"
                     className="transition-all duration-500 ease-out"
@@ -129,10 +131,10 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
 
             {/* ข้อความกลางโดนัท */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
                 รายจ่ายรวม
               </span>
-              <span className="text-sm font-black text-text-dark">
+              <span className="text-base font-black text-text-dark">
                 ฿{totalExpense.toLocaleString()}
               </span>
             </div>
@@ -143,17 +145,17 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
             {categoryData.map((data, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between text-xs"
+                className="flex items-center justify-between text-sm"
               >
                 <div className="flex items-center gap-2">
                   <div
-                    className="h-3 w-3 rounded-full shrink-0"
+                    className="h-3.5 w-3.5 rounded-full shrink-0"
                     style={{ backgroundColor: data.color }}
                   />
                   <span className="font-semibold text-text-dark">
                     {data.category}
                   </span>
-                  <span className="text-[10px] text-text-muted font-medium">
+                  <span className="text-xs text-text-muted font-medium">
                     ({data.percentage.toFixed(0)}%)
                   </span>
                 </div>

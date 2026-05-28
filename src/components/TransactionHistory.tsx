@@ -15,11 +15,11 @@ export function TransactionHistory({
   return (
     <Card className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between pb-1">
-        <h3 className="font-bold text-text-dark text-base">
+        <h3 className="font-extrabold text-text-dark text-lg">
           ความเคลื่อนไหวล่าสุด
         </h3>
         {transactions.length > 0 && (
-          <span className="text-xs text-text-muted font-medium hover:underline cursor-pointer">
+          <span className="text-sm text-text-muted font-medium hover:underline cursor-pointer">
             ดูทั้งหมด
           </span>
         )}
@@ -53,14 +53,14 @@ export function TransactionHistory({
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
-                      "h-9 w-9 rounded-xl flex items-center justify-center text-sm",
+                      "h-10 w-10 rounded-xl flex items-center justify-center text-base",
                       item.type === "income" ? "bg-[#E8F5E9]" : "bg-[#FCE4EC]",
                     )}
                   >
                     {displayEmoji}
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-text-dark">
+                    <h4 className="text-base font-bold text-text-dark">
                       {displayTitle}
                     </h4>
                     <span className="text-xs text-text-muted block mt-0.5">
@@ -70,7 +70,7 @@ export function TransactionHistory({
                 </div>
                 <span
                   className={cn(
-                    "text-sm font-bold",
+                    "text-base font-extrabold",
                     item.type === "income" ? "text-[#1B5E20]" : "text-[#880E4F]",
                   )}
                 >

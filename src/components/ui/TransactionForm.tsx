@@ -188,15 +188,15 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
         <h3 className="font-bold text-text-dark text-base">บันทึกรายการด่วน</h3>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* สวิตช์เลือกประเภท (รายรับ / รายจ่าย) */}
-        <div className="grid grid-cols-2 gap-2 bg-[#F7F5F0] p-1 rounded-2xl">
+        <div className="grid grid-cols-2 gap-2.5 bg-[#F7F5F0] p-1.5 rounded-2xl">
           <Button
             type="button"
             variant={type === "income" ? "income" : "ghost"}
             disabled={isPending}
             onClick={() => handleTypeChange("income")}
-            className="py-2.5 rounded-xl shadow-none font-semibold text-sm"
+            className="h-12 rounded-xl shadow-none font-bold text-base"
           >
             รายรับ 💸
           </Button>
@@ -205,7 +205,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
             variant={type === "expense" ? "expense" : "ghost"}
             disabled={isPending}
             onClick={() => handleTypeChange("expense")}
-            className="py-2.5 rounded-xl shadow-none font-semibold text-sm"
+            className="h-12 rounded-xl shadow-none font-bold text-base"
           >
             รายจ่าย 🍰
           </Button>
@@ -213,7 +213,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
 
         {/* ช่องกรอกจำนวนเงิน */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-text-muted block">
+          <label className="text-sm font-bold text-text-muted block">
             จำนวนเงิน (บาท)
           </label>
           <Input
@@ -223,22 +223,22 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             disabled={isPending}
-            icon={<span className="text-lg font-bold text-text-muted">฿</span>}
-            className="py-3 text-lg font-bold"
+            icon={<span className="text-xl font-black text-text-muted">฿</span>}
+            className="py-3 text-xl font-black"
             required
           />
         </div>
 
         {/* เลือกหมวดหมู่สำเร็จรูปสีพาสเทลเด่นชัด */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-text-muted block">
+          <label className="text-sm font-bold text-text-muted block">
             เลือกหมวดหมู่
           </label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             {getCategories().map((cat) => {
               const style = CATEGORY_STYLES[cat] ?? {
                 activeClass:
-                  "bg-primary-pastel/15 border-primary-pastel text-text-dark font-semibold shadow-sm",
+                  "bg-primary-pastel/15 border-primary-pastel text-text-dark font-bold shadow-sm",
                 inactiveClass:
                   "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
               };
@@ -249,7 +249,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
                   onClick={() => setCategory(cat)}
                   disabled={isPending}
                   className={cn(
-                    "py-2.5 px-3 text-xs font-bold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2",
+                    "py-3.5 px-4 text-sm font-extrabold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2",
                     category === cat ? style.activeClass : style.inactiveClass,
                   )}
                 >
@@ -262,7 +262,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
 
         {/* ช่องกรอกวันที่ */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-text-muted block">
+          <label className="text-sm font-bold text-text-muted block">
             วันที่บันทึก
           </label>
           <Input
@@ -270,7 +270,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
             value={date}
             onChange={(e) => setDate(e.target.value)}
             disabled={isPending}
-            icon={<Calendar className="h-4 w-4 text-text-muted" />}
+            icon={<Calendar className="h-5 w-5 text-text-muted" />}
             required
           />
         </div>
@@ -280,9 +280,9 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
           type="submit"
           variant={type === "income" ? "income" : "expense"}
           isPending={isPending}
-          className="w-full py-3.5"
+          className="w-full py-4 text-base font-black"
         >
-          {!isPending && <Plus className="h-4 w-4 mr-1 shrink-0" />}
+          {!isPending && <Plus className="h-5 w-5 mr-1.5 shrink-0" />}
           <span>
             {isPending ? "กำลังพูนเงินออม..." : "บันทึกความดีทางการเงิน ✨"}
           </span>
