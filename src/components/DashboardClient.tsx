@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useOptimistic, useTransition } from "react";
 
+import { createTransaction } from "@/actions/transactions";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { BalanceCard } from "@/components/ui/BalanceCard";
@@ -19,13 +20,21 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
   const [transactions, setTransactions] =
     useState<Transaction[]>(initialTransactions);
 
+  const [, startTransition] = useTransition();
+
+  // สร้าง Optimistic State สำหรับใช้แสดงผลแทน base transactions เพื่อให้ UI ตอบสนองในเสี้ยววินาที
+  const [optimisticTransactions, addOptimisticTransaction] = useOptimistic<
+    Transaction[],
+    Transaction
+  >(transactions, (state, newTx) => [newTx, ...state]);
+
   // สถานะข้อมูลผู้ใช้งานสำหรับแสดงบน Header
   const [userProfile, setUserProfile] = useState<{
     displayName: string;
-    emoji: string;
+    avatarUrl: string | null;
   }>({
-    displayName: "พี่ปูพูน",
-    emoji: "🦖",
+    displayName: "สมาชิกพูนพูน",
+    avatarUrl: null,
   });
 
   // โหลดโปรไฟล์ผู้ใช้เมื่อเมาท์คอมโพเนนต์
@@ -45,26 +54,65 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
             user.user_metadata?.display_name ||
             user.email?.split("@")[0] ||
             "สมาชิกพูนพูน",
-          emoji: "🪙",
+          avatarUrl:
+            user.user_metadata?.avatar_url ||
+            user.user_metadata?.picture ||
+            null,
         });
       }
     };
     fetchUser();
   }, []);
 
-  // คำนวณรายรับ-รายจ่ายรายเดือน
-  const totalIncome = transactions
+  // คำนวณรายรับ-รายจ่ายรายเดือน จากข้อมูล Optimistic (อัปเดตแบบเรียลไทม์ไม่ต้องรอเซิร์ฟเวอร์)
+  const totalIncome = optimisticTransactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
 
-  const totalExpense = transactions
+  const totalExpense = optimisticTransactions
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
 
   const balance = totalIncome - totalExpense;
 
-  const handleAddTransaction = (newTx: Transaction) => {
-    setTransactions((prev) => [newTx, ...prev]);
+  // จัดการการบันทึกรายการด้วยสถาปัตยกรรม Optimistic Updates
+  const handleAddTransaction = async (newTxData: {
+    amount: number;
+    type: "income" | "expense";
+    category: string;
+    date: string;
+  }) => {
+    return new Promise<{ success: boolean; error?: string }>((resolve) => {
+      startTransition(async () => {
+        // 1. จำลองข้อมูลแบบ Optimistic (แสดงบน UI ทันที)
+        const optimisticTx: Transaction = {
+          id: "opt-" + Date.now(),
+          ...newTxData,
+        };
+        addOptimisticTransaction(optimisticTx);
+
+        try {
+          // 2. เรียก Server Action ส่งข้อมูลไปยังฐานข้อมูลจริง
+          const result = await createTransaction(newTxData);
+          if (result.success && result.data) {
+            // 3. หากสำเร็จ อัปเดตข้อมูลถาวร (ฐานข้อมูลจริงจะเข้ามาแทนที่จำลองเมื่อ Transition จบ)
+            setTransactions((prev) => [result.data as Transaction, ...prev]);
+            resolve({ success: true });
+          } else {
+            resolve({
+              success: false,
+              error: result.error || "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
+            });
+          }
+        } catch (err) {
+          console.error("Optimistic transaction error:", err);
+          resolve({
+            success: false,
+            error: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
+          });
+        }
+      });
+    });
   };
 
   return (
@@ -72,7 +120,7 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
       {/* 1. Header ทักทาย */}
       <DashboardHeader
         displayName={userProfile.displayName}
-        emoji={userProfile.emoji}
+        avatarUrl={userProfile.avatarUrl}
       />
 
       {/* 2. Card สรุปยอดเงินคงเหลือ / รายรับ / รายจ่าย */}
@@ -83,13 +131,13 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
       />
 
       {/* 3. กราฟวิเคราะห์แบ่งตามหมวดหมู่สีพาสเทลแฮนด์เมด */}
-      <CategoryChart transactions={transactions} />
+      <CategoryChart transactions={optimisticTransactions} />
 
       {/* 4. ฟอร์มบันทึกรายรับ-รายจ่ายด่วน */}
       <TransactionForm onAddTransaction={handleAddTransaction} />
 
       {/* 5. ตารางประวัติความเคลื่อนไหวล่าสุด */}
-      <TransactionHistory transactions={transactions} />
+      <TransactionHistory transactions={optimisticTransactions} />
     </div>
   );
 }

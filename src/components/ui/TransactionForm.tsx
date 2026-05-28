@@ -13,10 +13,14 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useTransactionForm } from "@/hooks/useTransactionForm";
 import { cn } from "@/lib/utils";
-import { Transaction } from "@/types";
 
 interface TransactionFormProps {
-  onAddTransaction: (transaction: Transaction) => void;
+  onAddTransaction: (transaction: {
+    amount: number;
+    type: "income" | "expense";
+    category: string;
+    date: string;
+  }) => Promise<{ success: boolean; error?: string }>;
 }
 
 // แผนผังการกำหนดธีมสีพาสเทลสำหรับแต่ละหมวดหมู่
@@ -146,6 +150,12 @@ const CATEGORY_STYLES: Record<
       "bg-[#E8F5E9] border-[#66BB6A] text-[#1B5E20] font-bold shadow-sm",
     inactiveClass:
       "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#E8F5E9]/30",
+  },
+  "🫂 เงินรับจากครอบครัว/คนรู้จัก": {
+    activeClass:
+      "bg-[#EDE7F6] border-[#D1C4E9] text-[#4A148C] font-bold shadow-sm",
+    inactiveClass:
+      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#EDE7F6]/30",
   },
   "💵 เงินคืน/เงินทอน": {
     activeClass:

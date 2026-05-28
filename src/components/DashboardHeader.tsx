@@ -1,14 +1,16 @@
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
   displayName?: string;
-  emoji?: string;
+  avatarUrl?: string | null;
   className?: string;
 }
 
 export function DashboardHeader({
   displayName = "พี่ปูพูน",
-  emoji = "🦖",
+  avatarUrl,
   className,
 }: DashboardHeaderProps) {
   return (
@@ -25,13 +27,25 @@ export function DashboardHeader({
         </div>
         <p className="text-sm text-text-muted">
           ยินดีต้อนรับกลับบ้านนะ,{" "}
-          <span className="font-semibold text-text-dark">
-            {displayName} {emoji}
-          </span>
+          <span className="font-semibold text-text-dark">{displayName}</span>
         </p>
       </div>
-      <div className="h-10 w-10 rounded-full bg-[#E6DFD5] border-2 border-white flex items-center justify-center text-lg shadow-sm">
-        {emoji}
+
+      {/* รูปโปรไฟล์ผู้ใช้ — ถ้ามี avatarUrl ใช้รูปจริง ถ้าไม่มีใช้ตัวอักษรแรกของชื่อแทน */}
+      <div className="h-10 w-10 rounded-full border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+        {avatarUrl ? (
+          <Image
+            src={avatarUrl}
+            alt={displayName ?? "โปรไฟล์"}
+            width={40}
+            height={40}
+            className="object-cover w-full h-full"
+          />
+        ) : (
+          <div className="w-full h-full bg-[#E6DFD5] flex items-center justify-center text-lg font-bold text-text-dark">
+            {displayName?.[0]?.toUpperCase() ?? "🪙"}
+          </div>
+        )}
       </div>
     </header>
   );

@@ -1,10 +1,12 @@
 import { useEffect, useState, useTransition } from "react";
 
-import { createTransaction } from "@/actions/transactions";
-import { Transaction } from "@/types";
-
 interface UseTransactionFormProps {
-  onAddTransaction: (transaction: Transaction) => void;
+  onAddTransaction: (transaction: {
+    amount: number;
+    type: "income" | "expense";
+    category: string;
+    date: string;
+  }) => Promise<{ success: boolean; error?: string }>;
 }
 
 /**
@@ -41,6 +43,7 @@ export function useTransactionForm({
         "💼 รายได้อิสระ/ฟรีแลนซ์",
         "🎁 โบนัส/เงินรางวัล",
         "📈 เงินลงทุน/ปันผล",
+        "🫂 เงินรับจากครอบครัว/คนรู้จัก",
         "💵 เงินคืน/เงินทอน",
       ];
     }
@@ -90,26 +93,26 @@ export function useTransactionForm({
     setFeedback(null);
     const parsedAmount = Number(amount);
 
+    // รวมวันที่จาก Input เข้ากับเวลาปัจจุบันของ Client เพื่อป้องกันปัญหาเวลาเป็น 00:00:00 (เที่ยงคืนตรง)
+    const currentTime = new Date().toTimeString().split(" ")[0]; // ได้เป็น "HH:MM:SS"
+    const combinedDateTime = new Date(`${date}T${currentTime}`);
+    const isoDateString = isNaN(combinedDateTime.getTime())
+      ? new Date().toISOString()
+      : combinedDateTime.toISOString();
+
     startTransition(async () => {
       try {
-        const result = await createTransaction({
+        const result = await onAddTransaction({
           amount: parsedAmount,
           type,
           category,
-          date,
+          date: isoDateString,
         });
 
         if (result.success) {
           setFeedback({
             success: true,
             message: "บันทึกข้อมูลเรียบร้อยแล้วนะพูน! 🎉",
-          });
-          onAddTransaction({
-            id: String(Date.now()),
-            type,
-            amount: parsedAmount,
-            category,
-            date,
           });
           setAmount("");
           setCategory("");

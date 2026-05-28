@@ -9,6 +9,14 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   /* ใส่คอนฟิก Next.js อื่นๆ ตรงนี้ได้เลย */
   turbopack: {}, // ป้องกันข้อผิดพลาดของ Turbopack เมื่อใช้ร่วมกับ Custom Webpack plugins ในโหมด Dev
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com", // รูปโปรไฟล์จาก Google OAuth
+      },
+    ],
+  },
 }
 
 export default withPWA(nextConfig)

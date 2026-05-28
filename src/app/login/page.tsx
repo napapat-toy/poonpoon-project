@@ -71,7 +71,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-xs text-text-muted text-center py-1">
-          ระบบพูนพูนเปิดสิทธิ์ใช้งานเฉพาะบัญชี Google ของสมาชิกในบ้านเท่านั้น
+          ลงชื่อเข้าใช้งานด้วยบัญชี Google เพื่อเริ่มต้นบันทึกข้อมูล
         </p>
 
         <Button
@@ -109,7 +109,7 @@ export default function LoginPage() {
             </svg>
           )}
           <span>
-            {isPending ? "กำลังเชื่อมต่อ..." : "เข้าสู่บ้านด้วยบัญชี Google 🪙"}
+            {isPending ? "กำลังเชื่อมต่อ..." : "เข้าสู่ระบบด้วยบัญชี Google 🪙"}
           </span>
         </Button>
 
