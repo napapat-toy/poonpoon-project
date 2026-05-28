@@ -9,13 +9,17 @@ interface TransactionHistoryProps {
   transactions: Transaction[];
   className?: string;
   onDeleteTransaction?: (id: string) => void;
+  limit?: number;
 }
 
 export function TransactionHistory({
   transactions,
   className,
   onDeleteTransaction,
+  limit,
 }: TransactionHistoryProps) {
+  // กรองจำนวนรายการที่จะแสดงผล (เช่น 5 รายการล่าสุดในหน้าแรก)
+  const displayedTransactions = limit ? transactions.slice(0, limit) : transactions;
   return (
     <Card className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between pb-1">
@@ -44,7 +48,7 @@ export function TransactionHistory({
         </div>
       ) : (
         <div className="divide-y divide-[#F7F5F0]">
-          {transactions.map((item) => {
+          {displayedTransactions.map((item) => {
             const parts = item.category.split(" ");
             const emoji = parts[0];
             const categoryName = parts.slice(1).join(" ");

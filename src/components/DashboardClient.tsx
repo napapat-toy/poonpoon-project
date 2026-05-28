@@ -189,6 +189,7 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
       <TransactionHistory
         transactions={optimisticTransactions}
         onDeleteTransaction={handleDeleteTransaction}
+        limit={5}
       />
     </div>
   );
