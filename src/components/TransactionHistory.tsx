@@ -26,7 +26,7 @@ export function TransactionHistory({
         <h3 className="font-extrabold text-text-dark text-lg">
           ความเคลื่อนไหวล่าสุด
         </h3>
-        {transactions.length > 0 && (
+        {limit && transactions.length > 0 && (
           <Link
             href="/history"
             className="text-sm text-text-muted font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-primary-pastel rounded-lg px-2 py-0.5"
