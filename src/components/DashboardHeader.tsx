@@ -32,7 +32,7 @@ export function DashboardHeader({
       </div>
 
       {/* รูปโปรไฟล์ผู้ใช้ — ถ้ามี avatarUrl ใช้รูปจริง ถ้าไม่มีใช้ตัวอักษรแรกของชื่อแทน */}
-      <div className="h-10 w-10 rounded-full border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+      <div className="h-10 w-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
         {avatarUrl ? (
           <Image
             src={avatarUrl}
