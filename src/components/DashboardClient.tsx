@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useOptimistic, useTransition } from "react";
+import { useEffect, useState, useOptimistic, useTransition, use, Suspense } from "react";
 
 import { createTransaction, deleteTransaction } from "@/actions/transactions";
 import { DashboardHeader } from "@/components/DashboardHeader";
-import { TransactionHistory } from "@/components/TransactionHistory";
+import { TransactionHistory, TransactionHistorySkeleton } from "@/components/TransactionHistory";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BalanceCard } from "@/components/ui/BalanceCard";
 import { CategoryChart } from "@/components/ui/CategoryChart";
 import { TransactionForm } from "@/components/ui/TransactionForm";
@@ -12,13 +13,21 @@ import { Transaction } from "@/types";
 import { createClient } from "@/utils/supabase/client";
 
 interface DashboardClientProps {
-  initialTransactions: Transaction[];
+  transactionsPromise: Promise<Transaction[]>;
 }
 
-export function DashboardClient({ initialTransactions }: DashboardClientProps) {
-  // โหลดรายการธุรกรรมเริ่มต้นจาก Server Component และมาเก็บเป็น Client State
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(initialTransactions);
+export function DashboardClient({ transactionsPromise }: DashboardClientProps) {
+  // โหลดรายการธุรกรรมเริ่มต้นและเก็บเป็น Client State
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // คอยอัปเดตข้อมูลจริงใน Base State เมื่อ Promise โหลดเสร็จจากเซิร์ฟเวอร์
+  useEffect(() => {
+    transactionsPromise.then((data) => {
+      setTransactions(data);
+      setIsLoading(false);
+    });
+  }, [transactionsPromise]);
 
   const [, startTransition] = useTransition();
   
@@ -185,12 +194,43 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
       {/* 4. ฟอร์มบันทึกรายรับ-รายจ่ายด่วน */}
       <TransactionForm onAddTransaction={handleAddTransaction} />
 
-      {/* 5. ตารางประวัติความเคลื่อนไหวล่าสุด */}
-      <TransactionHistory
-        transactions={optimisticTransactions}
-        onDeleteTransaction={handleDeleteTransaction}
-        limit={5}
-      />
+      {/* 5. ตารางประวัติความเคลื่อนไหวล่าสุด (ห่อหุ้มด้วย ErrorBoundary และ Suspense ครอบไว้จุดเดียว) */}
+      <ErrorBoundary>
+        <Suspense fallback={<TransactionHistorySkeleton />}>
+          <HistorySuspenseWrapper
+            transactionsPromise={transactionsPromise}
+            optimisticTransactions={optimisticTransactions}
+            onDeleteTransaction={handleDeleteTransaction}
+            isLoading={isLoading}
+          />
+        </Suspense>
+      </ErrorBoundary>
     </div>
+  );
+}
+
+// คอมโพเนนต์ห่อหุ้มรายการประวัติเพื่อรองรับการระงับการเรนเดอร์ (Suspense) ขณะรอสัญญากลางอากาศ
+function HistorySuspenseWrapper({
+  transactionsPromise,
+  optimisticTransactions,
+  onDeleteTransaction,
+  isLoading,
+}: {
+  transactionsPromise: Promise<Transaction[]>;
+  optimisticTransactions: Transaction[];
+  onDeleteTransaction: (id: string) => void;
+  isLoading: boolean;
+}) {
+  // หากยังอยู่ระหว่างโหลด ให้เรียกใช้ use() เพื่อดีดการทำงานส่งผ่านไปหา Suspense fallback
+  if (isLoading) {
+    use(transactionsPromise);
+  }
+
+  return (
+    <TransactionHistory
+      transactions={optimisticTransactions}
+      onDeleteTransaction={onDeleteTransaction}
+      limit={5}
+    />
   );
 }

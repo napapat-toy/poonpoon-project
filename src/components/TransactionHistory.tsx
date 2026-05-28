@@ -131,3 +131,46 @@ export function TransactionHistory({
     </Card>
   );
 }
+
+interface TransactionHistorySkeletonProps {
+  className?: string;
+  showDelete?: boolean;
+}
+
+export function TransactionHistorySkeleton({
+  className,
+  showDelete = true,
+}: TransactionHistorySkeletonProps) {
+  return (
+    <Card className={cn("space-y-4 animate-pulse", className)}>
+      <div className="flex items-center justify-between pb-1">
+        {/* Title placeholder: matching text-lg (~h-7) */}
+        <div className="h-7 w-36 bg-[#EAE4DB] rounded-md" />
+        {/* Link placeholder: matching text-sm (~h-6) */}
+        <div className="h-6 w-16 bg-[#EAE4DB]/60 rounded-md" />
+      </div>
+      <div className="divide-y divide-[#F7F5F0]">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0"
+          >
+            <div className="flex items-center gap-3 flex-1">
+              <div className="h-10 w-10 rounded-xl bg-[#EAE4DB]/60 shrink-0" />
+              <div className="space-y-1.5 flex-1 max-w-[150px] sm:max-w-xs">
+                <div className="h-4 w-28 bg-[#EAE4DB] rounded-md" />
+                <div className="h-3.5 w-20 bg-[#EAE4DB]/50 rounded-md" />
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+              <div className="h-5 w-16 bg-[#EAE4DB] rounded-md" />
+              {showDelete && (
+                <div className="h-12 w-12 rounded-xl bg-[#EAE4DB]/20 shrink-0" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
