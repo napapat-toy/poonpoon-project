@@ -11,6 +11,8 @@ export const formatThaiDateShort = (dateString: string) => {
       hour: "2-digit", // แสดงชั่วโมง 2 หลัก เช่น 08
       minute: "2-digit", // แสดงนาที 2 หลัก เช่น 30
       hour12: false, // ใช้รูปแบบ 24 ชั่วโมง
+      timeZone: "Asia/Bangkok",
+      calendar: "buddhist",
     }).format(date) + " น."
   );
 };

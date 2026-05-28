@@ -6,6 +6,7 @@ interface UseTransactionFormProps {
     type: "income" | "expense";
     category: string;
     date: string;
+    description?: string;
   }) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -19,6 +20,7 @@ export function useTransactionForm({
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<"income" | "expense">("expense");
   const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
 
   // ป้องกัน Hydration Error: ตั้งค่าเริ่มต้นเป็นค่าว่าง แล้วจึงระบุวันที่ฝั่ง Client ตอนเมาท์คอมโพเนนต์
   const [date, setDate] = useState("");
@@ -107,6 +109,7 @@ export function useTransactionForm({
           type,
           category,
           date: isoDateString,
+          description: description.trim() || undefined,
         });
 
         if (result.success) {
@@ -116,6 +119,7 @@ export function useTransactionForm({
           });
           setAmount("");
           setCategory("");
+          setDescription("");
         } else {
           setFeedback({
             success: false,
@@ -140,6 +144,8 @@ export function useTransactionForm({
     setCategory,
     date,
     setDate,
+    description,
+    setDescription,
     isPending,
     feedback,
     getCategories,

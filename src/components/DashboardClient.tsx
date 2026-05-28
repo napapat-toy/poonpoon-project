@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useOptimistic, useTransition } from "react";
 
-import { createTransaction } from "@/actions/transactions";
+import { createTransaction, deleteTransaction } from "@/actions/transactions";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { BalanceCard } from "@/components/ui/BalanceCard";
@@ -21,12 +21,24 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
     useState<Transaction[]>(initialTransactions);
 
   const [, startTransition] = useTransition();
+  
+  type OptimisticAction =
+    | { type: "add"; transaction: Transaction }
+    | { type: "delete"; id: string };
 
   // สร้าง Optimistic State สำหรับใช้แสดงผลแทน base transactions เพื่อให้ UI ตอบสนองในเสี้ยววินาที
-  const [optimisticTransactions, addOptimisticTransaction] = useOptimistic<
+  const [optimisticTransactions, dispatchOptimistic] = useOptimistic<
     Transaction[],
-    Transaction
-  >(transactions, (state, newTx) => [newTx, ...state]);
+    OptimisticAction
+  >(transactions, (state, action) => {
+    if (action.type === "add") {
+      return [action.transaction, ...state];
+    }
+    if (action.type === "delete") {
+      return state.filter((tx) => tx.id !== action.id);
+    }
+    return state;
+  });
 
   // สถานะข้อมูลผู้ใช้งานสำหรับแสดงบน Header
   const [userProfile, setUserProfile] = useState<{
@@ -92,7 +104,7 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
           id: "opt-" + Date.now(),
           ...newTxData,
         };
-        addOptimisticTransaction(optimisticTx);
+        dispatchOptimistic({ type: "add", transaction: optimisticTx });
 
         try {
           // 2. เรียก Server Action ส่งข้อมูลไปยังฐานข้อมูลจริง
@@ -109,6 +121,39 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
           }
         } catch (err) {
           console.error("Optimistic transaction error:", err);
+          resolve({
+            success: false,
+            error: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
+          });
+        }
+      });
+    });
+  };
+
+  // จัดการการลบรายการด้วยสถาปัตยกรรม Optimistic Updates
+  const handleDeleteTransaction = async (id: string) => {
+    return new Promise<{ success: boolean; error?: string }>((resolve) => {
+      startTransition(async () => {
+        // 1. ลบข้อมูลแบบ Optimistic ทันทีบน UI
+        dispatchOptimistic({ type: "delete", id });
+
+        try {
+          // 2. เรียก Server Action ลบข้อมูลจริงแบบ Soft Delete
+          const result = await deleteTransaction(id);
+          if (result.success) {
+            // 3. หากสำเร็จ อัปเดตข้อมูลจริงใน Base State
+            setTransactions((prev) => prev.filter((tx) => tx.id !== id));
+            resolve({ success: true });
+          } else {
+            alert(result.error || "เกิดข้อผิดพลาดในการลบข้อมูล");
+            resolve({
+              success: false,
+              error: result.error || "เกิดข้อผิดพลาดในการลบข้อมูล",
+            });
+          }
+        } catch (err) {
+          console.error("Optimistic delete error:", err);
+          alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
           resolve({
             success: false,
             error: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
@@ -141,7 +186,10 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
       <TransactionForm onAddTransaction={handleAddTransaction} />
 
       {/* 5. ตารางประวัติความเคลื่อนไหวล่าสุด */}
-      <TransactionHistory transactions={optimisticTransactions} />
+      <TransactionHistory
+        transactions={optimisticTransactions}
+        onDeleteTransaction={handleDeleteTransaction}
+      />
     </div>
   );
 }

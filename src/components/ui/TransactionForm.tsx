@@ -6,6 +6,7 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
+  FileText,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface TransactionFormProps {
     type: "income" | "expense";
     category: string;
     date: string;
+    description?: string;
   }) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -174,6 +176,8 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
     setCategory,
     date,
     setDate,
+    description,
+    setDescription,
     isPending,
     feedback,
     getCategories,
@@ -258,6 +262,22 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
               );
             })}
           </div>
+        </div>
+
+        {/* ช่องกรอกคำอธิบายเพิ่มเติม */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold text-text-muted block">
+            คำอธิบายเพิ่มเติม / หมายเหตุ (ไม่บังคับ)
+          </label>
+          <Input
+            type="text"
+            placeholder="ระบุหมายเหตุ เช่น ซื้อข้าวเย็น, ค่ากาแฟ..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            disabled={isPending}
+            icon={<FileText className="h-5 w-5 text-text-muted" />}
+            maxLength={200}
+          />
         </div>
 
         {/* ช่องกรอกวันที่ */}

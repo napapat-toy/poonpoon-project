@@ -31,6 +31,11 @@ const createTransactionSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val ? new Date(val) : new Date())),
+  description: z
+    .string()
+    .max(200, 'คำอธิบายเพิ่มเติมต้องไม่เกิน 200 ตัวอักษร')
+    .optional()
+    .transform((val) => (val && val.trim() ? val.trim() : undefined)),
 })
 
 export type CreateTransactionInput = z.input<typeof createTransactionSchema>
@@ -53,7 +58,7 @@ export async function createTransaction(rawInput: CreateTransactionInput) {
       }
     }
 
-    const { amount, type, category, date } = validation.data
+    const { amount, type, category, date, description } = validation.data
 
     // 3. เชื่อมต่อ Supabase Server Client และทำ Auth Check
     const supabase = await createClient()
@@ -84,6 +89,7 @@ export async function createTransaction(rawInput: CreateTransactionInput) {
         amount,
         category,
         date: date.toISOString(),
+        description: description || null,
       })
       .select()
       .single()
@@ -106,6 +112,69 @@ export async function createTransaction(rawInput: CreateTransactionInput) {
     return {
       success: false,
       error: 'เกิดข้อผิดพลาดที่ไม่คาดคิดในการเชื่อมต่อระบบ',
+    }
+  }
+}
+
+/**
+ * Server Action สำหรับการลบธุรกรรมด้วยเทคนิค Soft Delete
+ * อัปเดตคอลัมน์ deleted_at แทนการลบแถวข้อมูลจริง เพื่อความปลอดภัยและมีประวัติย้อนหลัง (Audit Trail)
+ */
+export async function deleteTransaction(id: string) {
+  try {
+    if (!id) {
+      return {
+        success: false,
+        error: 'กรุณาระบุ ID ของรายการที่ต้องการลบ',
+      }
+    }
+
+    const supabase = await createClient()
+    if (!supabase) {
+      return {
+        success: false,
+        error: 'DATABASE_NOT_CONFIGURED',
+      }
+    }
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return {
+        success: false,
+        error: 'สิทธิ์การใช้งานไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่อีกครั้ง',
+      }
+    }
+
+    // ทำ Soft Delete: ตั้งค่าคอลัมน์ deleted_at เป็นเวลาปัจจุบัน
+    // และบังคับเงื่อนไข user_id = user.id ป้องกันช่องโหว่ IDOR
+    const { error: dbError } = await supabase
+      .from('transactions')
+      .update({
+        deleted_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (dbError) {
+      console.error('Database Delete Error:', dbError)
+      return {
+        success: false,
+        error: 'เกิดข้อผิดพลาดในการลบข้อมูลจากฐานข้อมูล',
+      }
+    }
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('Unhandled Server Action Delete Error:', error)
+    return {
+      success: false,
+      error: 'เกิดข้อผิดพลาดที่ไม่คาดคิดในการเชื่อมต่อเซิร์ฟเวอร์',
     }
   }
 }

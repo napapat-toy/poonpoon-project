@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Transaction } from "@/types";
@@ -6,11 +7,13 @@ import { formatThaiDateShort } from "@/utils/format";
 interface TransactionHistoryProps {
   transactions: Transaction[];
   className?: string;
+  onDeleteTransaction?: (id: string) => void;
 }
 
 export function TransactionHistory({
   transactions,
   className,
+  onDeleteTransaction,
 }: TransactionHistoryProps) {
   return (
     <Card className={cn("space-y-4", className)}>
@@ -53,7 +56,7 @@ export function TransactionHistory({
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
-                      "h-10 w-10 rounded-xl flex items-center justify-center text-base",
+                      "h-10 w-10 rounded-xl flex items-center justify-center text-base shrink-0",
                       item.type === "income" ? "bg-[#E8F5E9]" : "bg-[#FCE4EC]",
                     )}
                   >
@@ -63,20 +66,46 @@ export function TransactionHistory({
                     <h4 className="text-base font-bold text-text-dark">
                       {displayTitle}
                     </h4>
-                    <span className="text-xs text-text-muted block mt-0.5">
+                    {item.description && (
+                      <p className="text-sm text-text-muted font-medium mt-0.5 max-w-[150px] sm:max-w-xs break-words">
+                        &quot;{item.description}&quot;
+                      </p>
+                    )}
+                    <span className="text-xs text-text-muted block mt-0.5" suppressHydrationWarning>
                       {formatThaiDateShort(item.date)}
                     </span>
                   </div>
                 </div>
-                <span
-                  className={cn(
-                    "text-base font-extrabold",
-                    item.type === "income" ? "text-[#1B5E20]" : "text-[#880E4F]",
+                
+                <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                  <span
+                    className={cn(
+                      "text-base font-extrabold",
+                      item.type === "income" ? "text-[#1B5E20]" : "text-[#880E4F]",
+                    )}
+                  >
+                    {item.type === "income" ? "+" : "-"}฿
+                    {item.amount.toLocaleString()}
+                  </span>
+                  {onDeleteTransaction && (
+                    <button
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "ต้องการลบรายการนี้ใช่หรือไม่นะพูน? 🪙"
+                          )
+                        ) {
+                          onDeleteTransaction(item.id);
+                        }
+                      }}
+                      disabled={item.id.startsWith("opt-")}
+                      className="h-12 w-12 flex items-center justify-center rounded-xl text-text-muted hover:text-[#880E4F] hover:bg-[#FCE4EC]/50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#880E4F]/50 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-text-muted"
+                      aria-label="ลบรายการ"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
                   )}
-                >
-                  {item.type === "income" ? "+" : "-"}฿
-                  {item.amount.toLocaleString()}
-                </span>
+                </div>
               </div>
             );
           })}
