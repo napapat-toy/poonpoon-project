@@ -32,9 +32,11 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
   const [userProfile, setUserProfile] = useState<{
     displayName: string;
     avatarUrl: string | null;
+    email: string | null;
   }>({
     displayName: "สมาชิกพูนพูน",
     avatarUrl: null,
+    email: null,
   });
 
   // โหลดโปรไฟล์ผู้ใช้เมื่อเมาท์คอมโพเนนต์
@@ -58,6 +60,7 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
             user.user_metadata?.avatar_url ||
             user.user_metadata?.picture ||
             null,
+          email: user.email || null,
         });
       }
     };
@@ -121,6 +124,7 @@ export function DashboardClient({ initialTransactions }: DashboardClientProps) {
       <DashboardHeader
         displayName={userProfile.displayName}
         avatarUrl={userProfile.avatarUrl}
+        email={userProfile.email}
       />
 
       {/* 2. Card สรุปยอดเงินคงเหลือ / รายรับ / รายจ่าย */}
