@@ -45,21 +45,49 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
   );
 
   // 3. แปลงกลุ่มรายจ่ายเป็น Array เพื่อใช้จัดอันดับและคำนวณสัดส่วน
-  const categoryData = Object.entries(categoryGroups)
+  const sortedCategories = Object.entries(categoryGroups)
     .map(([category, amount]) => ({
       category,
       amount,
-      percentage: totalExpense > 0 ? (amount / totalExpense) * 100 : 0,
       color: CATEGORY_COLORS[category] || DEFAULT_COLOR,
     }))
     .sort((a, b) => b.amount - a.amount); // เรียงลำดับจากจ่ายเยอะสุดไปน้อยสุด
+
+  // จัดกลุ่ม Top 5 + ส่วนที่เหลือรวมเป็น "💸 อื่นๆ"
+  const topCategories = sortedCategories.slice(0, 5);
+  const otherCategories = sortedCategories.slice(5);
+
+  const categoryData: { category: string; amount: number; color: string }[] = [...topCategories];
+
+  if (otherCategories.length > 0) {
+    const otherAmount = otherCategories.reduce((sum, item) => sum + item.amount, 0);
+    categoryData.push({
+      category: "💸 อื่นๆ",
+      amount: otherAmount,
+      color: "#ECEFF1", // สีเทาพาสเทลสำหรับกลุ่ม "อื่นๆ"
+    });
+  }
+
+  // คำนวณสัดส่วนเปอร์เซ็นต์ของแต่ละรายการที่ผ่านการจัดกลุ่มแล้ว
+  const categoryDataWithPercentage = categoryData.map((item) => ({
+    ...item,
+    percentage: totalExpense > 0 ? (item.amount / totalExpense) * 100 : 0,
+  }));
+
+  // ฟังก์ชันช่วยเหลือสำหรับแสดงสัดส่วนเปอร์เซ็นต์ ป้องกัน 0% ปลอมของเศษสตางค์
+  const renderPercentageText = (percentage: number) => {
+    if (percentage > 0 && percentage < 1) {
+      return "< 1%";
+    }
+    return `${percentage.toFixed(1)}%`;
+  };
 
   // คำนวณความยาวเส้นรอบวงของวงกลม Donut Chart (รัศมี r = 40, เส้นรอบวง C = 2 * PI * r ≈ 251.2)
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
 
-  const chartSlices = categoryData.map((data, index) => {
-    const accumulated = categoryData
+  const chartSlices = categoryDataWithPercentage.map((data, index) => {
+    const accumulated = categoryDataWithPercentage
       .slice(0, index)
       .reduce((sum, item) => sum + item.percentage, 0);
     const dashLength = (data.percentage / 100) * circumference;
@@ -142,7 +170,7 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
 
           {/* ส่วนแสดง Legend รายละเอียดสีพาสเทลและมูลค่า */}
           <div className="flex-1 w-full space-y-2">
-            {categoryData.map((data, index) => (
+            {categoryDataWithPercentage.map((data, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between text-sm"
@@ -156,7 +184,7 @@ export function CategoryChart({ transactions, className }: CategoryChartProps) {
                     {data.category}
                   </span>
                   <span className="text-xs text-text-muted font-medium">
-                    ({data.percentage.toFixed(0)}%)
+                    ({renderPercentageText(data.percentage)})
                   </span>
                 </div>
                 <span className="font-bold text-text-dark">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Plus,
   Calendar,
@@ -185,6 +186,42 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
     handleSubmit,
   } = useTransactionForm({ onAddTransaction });
 
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  // 7 หมวดหมู่รายจ่ายใช้บ่อย
+  const topExpenseCategories = [
+    "🍚 อาหาร-มื้อหลัก",
+    "☕ เครื่องดื่ม/ของว่าง",
+    "🛒 ของใช้ในบ้าน",
+    "🚌 เดินทาง-ประจำวัน",
+    "💡 ค่าน้ำ-ไฟ-อินเทอร์เน็ต",
+    "✈️ ท่องเที่ยว/เดินทางไกล",
+    "👕 เสื้อผ้า/แฟชั่น",
+  ];
+
+  // 9 หมวดหมู่รายจ่ายที่ซ่อนอยู่ใน Bottom Sheet
+  const otherExpenseCategories = [
+    "🏠 ค่าเช่า/ที่พัก",
+    "📱 อุปกรณ์/แกดเจ็ต",
+    "🏥 ค่าหมอ/ยา",
+    "💇 ความงาม/ดูแลตัวเอง",
+    "🎓 การศึกษา/คอร์สเรียน",
+    "🎮 บันเทิง/เกม",
+    "🐾 สัตว์เลี้ยง",
+    "🎁 ของขวัญ/เงินช่วยเหลือ",
+    "🏦 ผ่อนชำระ/หนี้",
+  ];
+
+  // ตรวจสอบว่าขณะนี้เลือกหมวดหมู่ที่อยู่ในกลุ่ม "อื่นๆ" อยู่หรือไม่
+  const isOtherCategorySelected =
+    type === "expense" && otherExpenseCategories.includes(category);
+
+  // กำหนดคลาสตกแต่งปุ่มที่ 8 (ปุ่มหมวดหมู่อื่นๆ)
+  const otherButtonClass = isOtherCategorySelected
+    ? CATEGORY_STYLES[category]?.activeClass ||
+      "bg-primary-pastel/15 border-primary-pastel text-text-dark font-bold shadow-md scale-105 ring-2 ring-primary-pastel"
+    : "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]";
+
   return (
     <Card className="space-y-4">
       <div className="flex items-center gap-2 border-b border-[#F5EFE6] pb-3">
@@ -239,28 +276,71 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
             เลือกหมวดหมู่
           </label>
           <div className="grid grid-cols-2 gap-2.5">
-            {getCategories().map((cat) => {
-              const style = CATEGORY_STYLES[cat] ?? {
-                activeClass:
-                  "bg-primary-pastel/15 border-primary-pastel text-text-dark font-bold shadow-sm",
-                inactiveClass:
-                  "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
-              };
-              return (
+            {type === "income" ? (
+              // ฝั่งรายรับ (Income) แสดง 6 หมวดหมู่ทั้งหมดตามปกติ
+              getCategories().map((cat) => {
+                const style = CATEGORY_STYLES[cat] ?? {
+                  activeClass:
+                    "bg-primary-pastel/15 border-primary-pastel text-text-dark font-bold shadow-sm",
+                  inactiveClass:
+                    "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
+                };
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategory(cat)}
+                    disabled={isPending}
+                    className={cn(
+                      "py-3.5 px-4 text-sm font-extrabold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2 cursor-pointer",
+                      category === cat ? style.activeClass : style.inactiveClass,
+                    )}
+                  >
+                    <span>{cat}</span>
+                  </button>
+                );
+              })
+            ) : (
+              // ฝั่งรายจ่าย (Expense) แสดงเฉพาะ Top 7 + 1 ปุ่ม "หมวดหมู่อื่นๆ"
+              <>
+                {topExpenseCategories.map((cat) => {
+                  const style = CATEGORY_STYLES[cat] ?? {
+                    activeClass:
+                      "bg-primary-pastel/15 border-primary-pastel text-text-dark font-bold shadow-sm",
+                    inactiveClass:
+                      "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
+                  };
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setCategory(cat)}
+                      disabled={isPending}
+                      className={cn(
+                        "py-3.5 px-4 text-sm font-extrabold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2 cursor-pointer",
+                        category === cat ? style.activeClass : style.inactiveClass,
+                      )}
+                    >
+                      <span>{cat}</span>
+                    </button>
+                  );
+                })}
+                {/* ปุ่มที่ 8 หมวดหมู่อื่นๆ */}
                 <button
-                  key={cat}
                   type="button"
-                  onClick={() => setCategory(cat)}
+                  onClick={() => setIsBottomSheetOpen(true)}
                   disabled={isPending}
                   className={cn(
-                    "py-3.5 px-4 text-sm font-extrabold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2",
-                    category === cat ? style.activeClass : style.inactiveClass,
+                    "py-3.5 px-4 text-sm font-extrabold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2 cursor-pointer",
+                    otherButtonClass
                   )}
                 >
-                  <span>{cat}</span>
+                  <span>
+                    {isOtherCategorySelected ? category : "🔍 หมวดหมู่อื่นๆ"}
+                  </span>
                 </button>
-              );
-            })}
+              </>
+            )}
           </div>
         </div>
 
@@ -325,6 +405,66 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
             <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
           )}
           <span>{feedback.message}</span>
+        </div>
+      )}
+
+      {/* ระบบ Bottom Sheet ป๊อปอัปสไลด์จากขอบจอด้านล่างสำหรับหมวดหมู่ย่อยที่ซ่อนอยู่ */}
+      {isBottomSheetOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          {/* Backdrop Overlay */}
+          <div
+            className="absolute inset-0 bg-black/40 transition-opacity duration-300"
+            onClick={() => setIsBottomSheetOpen(false)}
+          />
+          {/* Slide-up Panel */}
+          <div className="relative bg-[#FDFBF7] w-full max-w-md rounded-t-3xl p-6 pb-8 shadow-2xl z-10 border-t border-[#EAE4DB] transition-transform duration-300 ease-out">
+            {/* Handle Bar */}
+            <div
+              className="mx-auto w-12 h-1.5 bg-[#EAE4DB] rounded-full mb-4 cursor-pointer"
+              onClick={() => setIsBottomSheetOpen(false)}
+            />
+
+            <div className="flex items-center justify-between pb-3 border-b border-[#F5EFE6] mb-4">
+              <h4 className="font-extrabold text-text-dark text-base">
+                เลือกหมวดหมู่อื่นๆ 🔍
+              </h4>
+              <button
+                type="button"
+                onClick={() => setIsBottomSheetOpen(false)}
+                className="text-text-muted hover:text-text-dark text-sm font-bold px-3 py-1 bg-[#F7F5F0] rounded-xl cursor-pointer"
+              >
+                ปิด
+              </button>
+            </div>
+
+            {/* Grid แสดงอีก 9 หมวดหมู่ที่เหลือ */}
+            <div className="grid grid-cols-2 gap-2.5 max-h-[50vh] overflow-y-auto pr-1">
+              {otherExpenseCategories.map((cat) => {
+                const style = CATEGORY_STYLES[cat] ?? {
+                  activeClass:
+                    "bg-primary-pastel/15 border-primary-pastel text-text-dark font-bold shadow-sm",
+                  inactiveClass:
+                    "bg-white border-[#EAE4DB] text-text-muted hover:bg-[#FDFBF7]",
+                };
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setCategory(cat);
+                      setIsBottomSheetOpen(false);
+                    }}
+                    className={cn(
+                      "py-3.5 px-4 text-sm font-extrabold rounded-2xl border text-left transition-all duration-200 select-none flex items-center gap-2 cursor-pointer",
+                      category === cat ? style.activeClass : style.inactiveClass,
+                    )}
+                  >
+                    <span>{cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
     </Card>
