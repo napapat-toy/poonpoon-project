@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -22,9 +23,12 @@ export function TransactionHistory({
           ความเคลื่อนไหวล่าสุด
         </h3>
         {transactions.length > 0 && (
-          <span className="text-sm text-text-muted font-medium hover:underline cursor-pointer">
+          <Link
+            href="/history"
+            className="text-sm text-text-muted font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-primary-pastel rounded-lg px-2 py-0.5"
+          >
             ดูทั้งหมด
-          </span>
+          </Link>
         )}
       </div>
 
@@ -63,17 +67,26 @@ export function TransactionHistory({
                     {displayEmoji}
                   </div>
                   <div>
-                    <h4 className="text-base font-bold text-text-dark">
-                      {displayTitle}
-                    </h4>
+                    <div className="flex flex-wrap items-baseline gap-x-2">
+                      <h4 className="text-base font-bold text-text-dark">
+                        {displayTitle}
+                      </h4>
+                      {!item.description && (
+                        <span className="text-xs text-text-muted font-medium" suppressHydrationWarning>
+                          {formatThaiDateShort(item.date)}
+                        </span>
+                      )}
+                    </div>
                     {item.description && (
-                      <p className="text-sm text-text-muted font-medium mt-0.5 max-w-[150px] sm:max-w-xs wrap-break-word">
-                        &quot;{item.description}&quot;
-                      </p>
+                      <>
+                        <p className="text-sm text-text-muted font-medium mt-0.5 max-w-[150px] sm:max-w-xs wrap-break-word">
+                          &quot;{item.description}&quot;
+                        </p>
+                        <span className="text-xs text-text-muted block mt-0.5" suppressHydrationWarning>
+                          {formatThaiDateShort(item.date)}
+                        </span>
+                      </>
                     )}
-                    <span className="text-xs text-text-muted block mt-0.5" suppressHydrationWarning>
-                      {formatThaiDateShort(item.date)}
-                    </span>
                   </div>
                 </div>
                 

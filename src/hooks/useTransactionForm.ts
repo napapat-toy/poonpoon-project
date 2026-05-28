@@ -17,7 +17,13 @@ interface UseTransactionFormProps {
 export function useTransactionForm({
   onAddTransaction,
 }: UseTransactionFormProps) {
-  const [amount, setAmount] = useState("");
+  const [amount, rawSetAmount] = useState("");
+  const setAmount = (val: string) => {
+    // ดักจับและอนุญาตเฉพาะตัวเลขและทศนิยมไม่เกิน 2 ตำแหน่งเท่านั้น
+    if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
+      rawSetAmount(val);
+    }
+  };
   const [type, setType] = useState<"income" | "expense">("expense");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
