@@ -254,9 +254,8 @@ export function SavingGoalsCard({
                 key={item.id}
                 className={cn(
                   "p-4 border border-[#F7F5F0] rounded-2xl space-y-2.5 transition-all",
-                  percentage >= 100
-                    ? "bg-[#E8F5E9]/10 border-[#E8F5E9]"
-                    : "bg-white",
+                  bgFillColor,
+                  percentage >= 100 && "border-[#E8F5E9]",
                 )}
               >
                 {/* หัวข้อย่อยของเป้าหมาย */}
@@ -298,7 +297,7 @@ export function SavingGoalsCard({
                   <div className="h-3 w-full bg-[#F7F5F0] rounded-full overflow-hidden relative">
                     <div
                       className={cn(
-                        "h-full rounded-full bg-gradient-to-r transition-all duration-700 ease-out",
+                        "h-full rounded-full bg-linear-to-r transition-all duration-700 ease-out",
                         progressGradient,
                       )}
                       style={{ width: `${percentage}%` }}
