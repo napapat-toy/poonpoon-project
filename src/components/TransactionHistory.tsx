@@ -67,7 +67,7 @@ export function TransactionHistory({
                       {displayTitle}
                     </h4>
                     {item.description && (
-                      <p className="text-sm text-text-muted font-medium mt-0.5 max-w-[150px] sm:max-w-xs break-words">
+                      <p className="text-sm text-text-muted font-medium mt-0.5 max-w-[150px] sm:max-w-xs wrap-break-word">
                         &quot;{item.description}&quot;
                       </p>
                     )}
