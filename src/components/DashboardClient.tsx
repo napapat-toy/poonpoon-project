@@ -1,176 +1,45 @@
 "use client";
 
-import { useEffect, useState, useOptimistic, useTransition, use, Suspense } from "react";
-
-import { createTransaction, deleteTransaction } from "@/actions/transactions";
+import { use, Suspense } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { TransactionHistory, TransactionHistorySkeleton } from "@/components/TransactionHistory";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BalanceCard } from "@/components/ui/BalanceCard";
 import { CategoryChart } from "@/components/ui/CategoryChart";
 import { TransactionForm } from "@/components/ui/TransactionForm";
-import { Transaction } from "@/types";
-import { createClient } from "@/utils/supabase/client";
+import { Transaction, SavingGoal } from "@/types";
+import { SavingGoalsCard, SavingGoalsSkeleton } from "@/components/SavingGoalsCard";
+import { useDashboard } from "@/hooks/useDashboard";
 
 interface DashboardClientProps {
   transactionsPromise: Promise<Transaction[]>;
+  savingGoalsPromise: Promise<{
+    success: boolean;
+    data?: SavingGoal[];
+    error?: string;
+  }>;
 }
 
-export function DashboardClient({ transactionsPromise }: DashboardClientProps) {
-  // โหลดรายการธุรกรรมเริ่มต้นและเก็บเป็น Client State
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // คอยอัปเดตข้อมูลจริงใน Base State เมื่อ Promise โหลดเสร็จจากเซิร์ฟเวอร์
-  useEffect(() => {
-    transactionsPromise.then((data) => {
-      setTransactions(data);
-      setIsLoading(false);
-    });
-  }, [transactionsPromise]);
-
-  const [, startTransition] = useTransition();
-  
-  type OptimisticAction =
-    | { type: "add"; transaction: Transaction }
-    | { type: "delete"; id: string };
-
-  // สร้าง Optimistic State สำหรับใช้แสดงผลแทน base transactions เพื่อให้ UI ตอบสนองในเสี้ยววินาที
-  const [optimisticTransactions, dispatchOptimistic] = useOptimistic<
-    Transaction[],
-    OptimisticAction
-  >(transactions, (state, action) => {
-    if (action.type === "add") {
-      return [action.transaction, ...state];
-    }
-    if (action.type === "delete") {
-      return state.filter((tx) => tx.id !== action.id);
-    }
-    return state;
-  });
-
-  // สถานะข้อมูลผู้ใช้งานสำหรับแสดงบน Header
-  const [userProfile, setUserProfile] = useState<{
-    displayName: string;
-    avatarUrl: string | null;
-    email: string | null;
-  }>({
-    displayName: "สมาชิกพูนพูน",
-    avatarUrl: null,
-    email: null,
-  });
-
-  // โหลดโปรไฟล์ผู้ใช้เมื่อเมาท์คอมโพเนนต์
-  useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient();
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        setUserProfile({
-          displayName:
-            user.user_metadata?.full_name ||
-            user.user_metadata?.name ||
-            user.user_metadata?.display_name ||
-            user.email?.split("@")[0] ||
-            "สมาชิกพูนพูน",
-          avatarUrl:
-            user.user_metadata?.avatar_url ||
-            user.user_metadata?.picture ||
-            null,
-          email: user.email || null,
-        });
-      }
-    };
-    fetchUser();
-  }, []);
-
-  // คำนวณรายรับ-รายจ่ายรายเดือน จากข้อมูล Optimistic (อัปเดตแบบเรียลไทม์ไม่ต้องรอเซิร์ฟเวอร์)
-  const totalIncome = optimisticTransactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpense = optimisticTransactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const balance = totalIncome - totalExpense;
-
-  // จัดการการบันทึกรายการด้วยสถาปัตยกรรม Optimistic Updates
-  const handleAddTransaction = async (newTxData: {
-    amount: number;
-    type: "income" | "expense";
-    category: string;
-    date: string;
-  }) => {
-    return new Promise<{ success: boolean; error?: string }>((resolve) => {
-      startTransition(async () => {
-        // 1. จำลองข้อมูลแบบ Optimistic (แสดงบน UI ทันที)
-        const optimisticTx: Transaction = {
-          id: "opt-" + Date.now(),
-          ...newTxData,
-        };
-        dispatchOptimistic({ type: "add", transaction: optimisticTx });
-
-        try {
-          // 2. เรียก Server Action ส่งข้อมูลไปยังฐานข้อมูลจริง
-          const result = await createTransaction(newTxData);
-          if (result.success && result.data) {
-            // 3. หากสำเร็จ อัปเดตข้อมูลถาวร (ฐานข้อมูลจริงจะเข้ามาแทนที่จำลองเมื่อ Transition จบ)
-            setTransactions((prev) => [result.data as Transaction, ...prev]);
-            resolve({ success: true });
-          } else {
-            resolve({
-              success: false,
-              error: result.error || "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
-            });
-          }
-        } catch (err) {
-          console.error("Optimistic transaction error:", err);
-          resolve({
-            success: false,
-            error: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
-          });
-        }
-      });
-    });
-  };
-
-  // จัดการการลบรายการด้วยสถาปัตยกรรม Optimistic Updates
-  const handleDeleteTransaction = async (id: string) => {
-    return new Promise<{ success: boolean; error?: string }>((resolve) => {
-      startTransition(async () => {
-        // 1. ลบข้อมูลแบบ Optimistic ทันทีบน UI
-        dispatchOptimistic({ type: "delete", id });
-
-        try {
-          // 2. เรียก Server Action ลบข้อมูลจริงแบบ Soft Delete
-          const result = await deleteTransaction(id);
-          if (result.success) {
-            // 3. หากสำเร็จ อัปเดตข้อมูลจริงใน Base State
-            setTransactions((prev) => prev.filter((tx) => tx.id !== id));
-            resolve({ success: true });
-          } else {
-            alert(result.error || "เกิดข้อผิดพลาดในการลบข้อมูล");
-            resolve({
-              success: false,
-              error: result.error || "เกิดข้อผิดพลาดในการลบข้อมูล",
-            });
-          }
-        } catch (err) {
-          console.error("Optimistic delete error:", err);
-          alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
-          resolve({
-            success: false,
-            error: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
-          });
-        }
-      });
-    });
-  };
+export function DashboardClient({
+  transactionsPromise,
+  savingGoalsPromise,
+}: DashboardClientProps) {
+  // ดึงค่าสถานะและฟังก์ชันจัดการทั้งหมดออกมาจาก Custom Hook เพื่อแยกตรรกะออกจาก UI
+  const {
+    userProfile,
+    isLoading,
+    isGoalsLoading,
+    optimisticTransactions,
+    optimisticGoals,
+    totalIncome,
+    totalExpense,
+    balance,
+    handleAddTransaction,
+    handleDeleteTransaction,
+    handleCreateGoal,
+    handleUpdateGoalAmount,
+    handleDeleteGoal,
+  } = useDashboard({ transactionsPromise, savingGoalsPromise });
 
   return (
     <div className="space-y-6">
@@ -187,6 +56,20 @@ export function DashboardClient({ transactionsPromise }: DashboardClientProps) {
         totalIncome={totalIncome}
         totalExpense={totalExpense}
       />
+
+      {/* 2.5. ระบบตั้งเป้าหมายเงินออม (ห่อหุ้มด้วย ErrorBoundary และ Suspense แยกอิสระ) */}
+      <ErrorBoundary>
+        <Suspense fallback={<SavingGoalsSkeleton />}>
+          <GoalsSuspenseWrapper
+            savingGoalsPromise={savingGoalsPromise}
+            optimisticGoals={optimisticGoals}
+            onUpdateGoalAmount={handleUpdateGoalAmount}
+            onCreateGoal={handleCreateGoal}
+            onDeleteGoal={handleDeleteGoal}
+            isLoading={isGoalsLoading}
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* 3. กราฟวิเคราะห์แบ่งตามหมวดหมู่สีพาสเทลแฮนด์เมด */}
       <CategoryChart transactions={optimisticTransactions} />
@@ -231,6 +114,36 @@ function HistorySuspenseWrapper({
       transactions={optimisticTransactions}
       onDeleteTransaction={onDeleteTransaction}
       limit={5}
+    />
+  );
+}
+
+// คอมโพเนนต์ห่อหุ้มเป้าหมายการเงินเพื่อรองรับการระงับการเรนเดอร์ (Suspense) ขณะรอสัญญากลางอากาศ
+function GoalsSuspenseWrapper({
+  savingGoalsPromise,
+  optimisticGoals,
+  onUpdateGoalAmount,
+  onCreateGoal,
+  onDeleteGoal,
+  isLoading,
+}: {
+  savingGoalsPromise: Promise<{ success: boolean; data?: SavingGoal[]; error?: string }>;
+  optimisticGoals: SavingGoal[];
+  onUpdateGoalAmount: (id: string, amount: number) => Promise<{ success: boolean; error?: string }>;
+  onCreateGoal: (data: { name: string; target_amount: number; target_date?: string | null }) => Promise<{ success: boolean; error?: string }>;
+  onDeleteGoal: (id: string) => Promise<{ success: boolean; error?: string }>;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    use(savingGoalsPromise);
+  }
+
+  return (
+    <SavingGoalsCard
+      goals={optimisticGoals}
+      onUpdateGoalAmount={onUpdateGoalAmount}
+      onCreateGoal={onCreateGoal}
+      onDeleteGoal={onDeleteGoal}
     />
   );
 }

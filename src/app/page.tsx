@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { DashboardClient } from "@/components/DashboardClient";
 import { Transaction } from "@/types";
 import { createClient } from "@/utils/supabase/server";
+import { getSavingGoals } from "@/actions/savingGoals";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -32,6 +33,12 @@ export default async function DashboardPage() {
   };
 
   const transactionsPromise = fetchTransactions();
+  const savingGoalsPromise = getSavingGoals();
 
-  return <DashboardClient transactionsPromise={transactionsPromise} />;
+  return (
+    <DashboardClient
+      transactionsPromise={transactionsPromise}
+      savingGoalsPromise={savingGoalsPromise}
+    />
+  );
 }
